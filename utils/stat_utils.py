@@ -56,26 +56,27 @@ def is_paramteric(data_list: list):
     return parametric, out_str
 
 
-def benj_hoch(pval_dict: dict, out_file: str):
+def benj_hoch(pval_dict: dict, out_file: str = None):
     """
     Calculates the Benjamin-Hochberg test
     :param pval_dict: A doctionary of label:p-value
     :param out_file: The output file
-    :return: The adjusted P values
+    :return: The adjusted P values and a string
     """
-    q = alpha  # The false discovery rate
     pval_tuples = sorted(pval_dict.items(), key=lambda kv: kv[1])
-    lables, pvals = (zip(*pval_tuples))
+    labels, pvals = (zip(*pval_tuples))
     pval_num = len(pvals)
     bh_dict = {}
     rank = 1
-    for _ in pvals:
-        bh = q * (rank / pval_num)
-        bh_dict[lables[rank - 1]] = bh
+    for p in pvals:
+        bh = p * (pval_num / rank)
+        bh_dict[labels[rank - 1]] = bh
         rank += 1
-    str_out = f'Benjamin-Hochberg false detection rate results: \n{bh_dict}'
-    with open(out_file, 'a') as f:
-        f.write(str_out)
+    str_out = f'Benjamin-Hochberg false detection rate results: \n{bh_dict}\n'
+    if out_file:
+        with open(out_file, 'a') as f:
+            f.write(str_out)
+    return str_out, bh_dict
 
 
 def ttest(arg_list):
@@ -141,7 +142,7 @@ def analyze_df(df: pd.DataFrame, name: str, out_file: str = None, log_object: Lo
     :param name: The comparison field
     :param out_file: The output file
     :param log_object: The Logger object, for documentation
-    :return: The ANOVA/Kruskal Wallis p-value
+    :return: The ANOVA/Kruskal Wallis p-value, the Mann-Whitney p-value dictionary, and the Benjamini-Hochberg dict.
     """
     non_na_num = len(df.dropna())
     if non_na_num > 5000:
@@ -153,6 +154,7 @@ def analyze_df(df: pd.DataFrame, name: str, out_file: str = None, log_object: Lo
     data_list = [df[col].sample(n=non_na_num) for col in df]  # A list of series
     pval = None
     pval_dict = None
+    fdr_dict = None
 
     # name = data_list[0].name
 
@@ -180,7 +182,6 @@ def analyze_df(df: pd.DataFrame, name: str, out_file: str = None, log_object: Lo
                 # Post Hoc
                 curr_str, pval_dict = ttest(data_list)
                 out_str += curr_str
-                # out_str += ttest(data_list)
 
             else:
                 # Converting the series to lists
@@ -198,7 +199,10 @@ def analyze_df(df: pd.DataFrame, name: str, out_file: str = None, log_object: Lo
                 # Post Hoc
                 curr_str, pval_dict = mwtest(data_list)
                 out_str += curr_str
-                # out_str += mwtest(data_list)
+                curr_str, fdr_dict = benj_hoch(pval_dict)
+                out_str += curr_str
+
+
         else:
             out_str += 'All values are identicle. Not analyzing siginificance.\n'
 
@@ -207,4 +211,4 @@ def analyze_df(df: pd.DataFrame, name: str, out_file: str = None, log_object: Lo
         with open(out_file, 'a') as f:
             f.write(out_str)
 
-    return pval, pval_dict
+    return pval, pval_dict, fdr_dict

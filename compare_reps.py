@@ -82,9 +82,11 @@ def create_box_plots_and_stats(dfs: list, box_fields: list, out_dir: str, name: 
 
     pvals = {}
     pval_pair_dict = {}
+    fdr_pair_dict = {}
 
     stat_file_name = f'{out_dir}/{name}_statistics.txt'  # Defining the output name
-    stat_table_name = f'{out_dir}/{name}_statistics_2_samples.csv'  # Defining the output name
+    stat_table_name_pvals = f'{out_dir}/{name}_statistics_2_samples.csv'  # Defining the output name
+    stat_table_name_fdr = f'{out_dir}/{name}_statistics_2_samples_fdr.csv'  # Defining the output name
 
     general_utils.remove_files([stat_file_name])
 
@@ -105,10 +107,10 @@ def create_box_plots_and_stats(dfs: list, box_fields: list, out_dir: str, name: 
                 sum_df = pd.DataFrame.from_dict(dic, orient='index')
                 sum_df = sum_df.transpose()
                 sum_df.to_csv(table_name, index=False)
-                pval, pval_dict = None, None
+                pval, pval_dict, fdr_dict = None, None, None
 
                 try:
-                    pval, pval_dict = stat_utils.analyze_df(sum_df, name=field, out_file=stat_file_name,
+                    pval, pval_dict, fdr_dict = stat_utils.analyze_df(sum_df, name=field, out_file=stat_file_name,
                                                             log_object=log_object)
                 except Exception as e:
                     log_object.warning(f'Could not perform statistical analysis on the field {field}: {e}')
@@ -117,10 +119,13 @@ def create_box_plots_and_stats(dfs: list, box_fields: list, out_dir: str, name: 
                     pvals[field] = pval
                 if pval_dict is not None:
                     pval_pair_dict[field] = pval_dict
+                if fdr_dict is not None:
+                    fdr_pair_dict[field] = fdr_dict
 
     pval_df = pd.DataFrame(pval_pair_dict)
-    pval_df.to_csv(stat_table_name)
-    stat_utils.benj_hoch(pvals, stat_file_name)
+    pval_df.to_csv(stat_table_name_pvals)
+    fdr_df = pd.DataFrame(fdr_pair_dict)
+    fdr_df.to_csv(stat_table_name_fdr)
 
 
 def comp_mtree(args):
