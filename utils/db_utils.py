@@ -138,6 +138,9 @@ def link_alignment_to_tree_by_df(t: Tree, df: pd.DataFrame, log_object=current_l
         t = general_utils.replace_new_line_in_ig_tree(t)
         all_seq_assigned_flag = True
 
+        # replacing the : with _ in the column name
+        df[_id_field] = df[_id_field].str.replace(':', '-')
+
         # print(t.get_ascii(show_internal=True))
 
         # Attaching the germline sequences to the tree

@@ -162,8 +162,8 @@ def create_legend(color_dict: dict, legend_file_name: str = "legend.dot", direct
         fout.write('digraph legend {\nsubgraph cluster_legend {\nlabel = \"Legend\"\ncolor=black\n\n' + hd + '[]')
         arrows_string = ""
         for pop0 in color_dict:
-            #pop = pop0.replace("-", "_")  # For later drawing by dot
-            pop=re.sub(r'^_', '', pop0) # Removing the _ in the beginning
+            # pop = pop0.replace("-", "_")  # For later drawing by dot
+            pop = re.sub(r'^_', '', pop0)  # Removing the _ in the beginning
             fout.write(f'\"{pop}\" [fillcolor=\"{color_dict[pop0]}\" style=filled];\n')
 
             arrows_string = arrows_string + "\"" + pop + "\""
@@ -173,7 +173,6 @@ def create_legend(color_dict: dict, legend_file_name: str = "legend.dot", direct
         fout.write(arrows_string)
 
         fout.write("}\n}")  # Closing the graph
-
 
         return legend_file_name
 
@@ -247,4 +246,20 @@ def create_color_dict(pops):
         color_dict[pop] = hex_col
         col = col + delta
         hex_col = mcolors.to_hex(color_palt(col))
+    return color_dict
+
+
+def create_color_dict_from_colors(pops: list, colors: list):
+    """
+    Creates a dictionary of "population: color"
+    :param pops: The populations
+    :param colors: The colors
+    :return: The color dictionary
+    """
+    color_dict = {}
+
+    i = 0
+    for pop in pops:
+        color_dict[pop] = colors[i]
+        i += 1
     return color_dict

@@ -153,6 +153,13 @@ def get_arg_parser():
                                                                      'Default - 40', default='40')
     parse_draw.add_argument('-w', '--linewidth', action='store', help='The line width in the output figure node names. '
                                                                       'Default - 30', default='30')
+
+    parse_draw.add_argument('-c', '--colors', action='store', nargs='+',
+                            help='The colors for the populations in the same order of the populations. '
+                                 'Must be in the same number of populations. '
+                                 'Should be in a HEX format (for example: #5e4fa2) or a color name. '
+                                 'The color names appears in https://www.graphviz.org/doc/info/colors.html '
+                                 'Default - depends on the number of populations')
     parse_draw.set_defaults(function=call_draw)
 
     return parser

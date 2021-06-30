@@ -75,8 +75,8 @@ def new_to_dot(t, fontsize: int, line_width: int, output_file=None):
             else:
                 if not hasattr(node, 'name'):  # An inferred node
                     node.name = ''
-                elif 'Germline' in node.name: # Non root germline
-                    continue # TEMP
+                elif 'Germline' in node.name:  # Non root germline
+                    continue  # TEMP
 
             node.nid = str(counter)
 
@@ -129,12 +129,20 @@ def test_input(args):
 
     # Check if the output format is supported by dot
     elif args.format not in valid_formats:
-        arg_error = f'The format {args.format} is not supported by the dot program. ' \
+        arg_error = f'The output format {args.format} is not supported by the dot program. ' \
                     f'The supported formats are {valid_formats}'
 
     # Check if the font size is a number
     elif not re.search(r'\d+', args.fontsize):
         arg_error = f'The fontsize parameter must except a number'
+
+    # Check if there are colors when no populations were given
+    elif args.colors and (not args.pops):
+        arg_error = f'The colors parameter must be used together with the populations parameter'
+
+    # Check if the number of populations is equal to the number of colors
+    elif args.colors and (len(args.colors) != len(args.pops)):
+        arg_error = f'the number of colors must be equal to the number of populations'
 
     return arg_error
 
@@ -200,8 +208,12 @@ def draw_trees(args):
         dot_files = pool.starmap(new_to_dot, zip(tree_list, repeat(args.fontsize), repeat(args.linewidth)))
         intermediate_files += dot_files
 
+        # Get the color dictionary
         if args.pops:
-            color_dict = draw_utils.create_color_dict(args.pops)  # Get the color dictionary
+            if args.colors:
+                color_dict = draw_utils.create_color_dict_from_colors(args.pops, args.colors)
+            else:
+                color_dict = draw_utils.create_color_dict(args.pops)
 
             # Color all trees in parallel
             color_dot_trees = pool.starmap(draw_utils.color_trees, zip(dot_files, repeat(color_dict)))
@@ -219,7 +231,7 @@ def draw_trees(args):
 
         # Drawing trees using the dot program in parallel
         pool.starmap(draw_using_dot,
-                                   zip(dot_files, repeat(args.dot), repeat(log_object), repeat(args.format)))
+                     zip(dot_files, repeat(args.dot), repeat(log_object), repeat(args.format)))
 
         if not args.keep:
             # Delete the intermediate files
