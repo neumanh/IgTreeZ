@@ -191,7 +191,7 @@ def link_alignment_to_tree_by_df(t: Tree, df: pd.DataFrame, log_object=current_l
                                                             log_object=log_object, exit_stat=False)
                                 alright_flag = False
         else:
-            general_utils.handle_errors(f'Could not find a germline sequence for the tree {t.id}',
+            general_utils.handle_errors(f'Could not find a germline sequence for tree {t.id}',
                                         log_object, exit_stat=False)
             alright_flag = False
         t.seq_num = seq_num

@@ -23,6 +23,7 @@ from objects import Logger
 sample_str = 'sample'
 id_str = 'tree_id'
 parent_dir_name = 'IgTreeZ_output'
+# defined by IMGT http://www.imgt.org/IMGTScientificChart/Nomenclature/IMGT-FRCDRdefinition.html
 imgt_regions = {'fwr1': 0, 'cdr1': 78, 'fwr2': 114, 'cdr2': 165, 'fwr3': 195, 'cdr3': 313, 'cdr3_end': 312}
 
 curr_log_object = None

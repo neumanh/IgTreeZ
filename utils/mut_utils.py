@@ -16,6 +16,24 @@ from objects import Mutation, Logger
 from utils import general_utils
 
 gls = ["GL", "G.L", 'G.L.', "Germline", "Germline_UCA", 'EX;G.L', 'EX_G.L']
+all_mut_field = 'all_mutations'
+all_fields = [general_utils.sample_str, general_utils.id_str, 'nodes', 'sequences',
+              'source_a', 'source_c', 'source_g', 'source_t', 'transition', 'transversion', 'replacement', 'silent',
+              'cdr1', 'cdr2', 'cdr3', 'CDR', 'fwr1', 'fwr2', 'fwr3', 'FWR',
+              'positive_source', 'negative_source', 'neutral_charge_source',
+              'positive_target', 'negative_target', 'neutral_charge_target', 'charge_keep', 'charge_change',
+              'hydrophobic_source', 'hydrophilic_source', 'neutral_hydro_source',
+              'hydrophobic_target', 'hydrophilic_target', 'neutral_hydro_target', 'hydro_keep', 'hydro_change',
+              'vs_volume_source', 'small_volume_source', 'medium_volume_source', 'large_volume_source',
+              'vl_volume_source', 'vs_volume_target', 'small_volume_target', 'medium_volume_target',
+              'large_volume_target', 'vl_volume_target', 'volume_decrease', 'volume_increase', 'volume_keep',
+              'amide_source', 'acidic_source', 'basic_source', 'hydroxyl_source', 'sulfur_source', 'aromatic_source',
+              'aliphatic_source', 'amide_target', 'acidic_target', 'basic_target', 'hydroxyl_target', 'sulfur_target',
+              'aromatic_target', 'aliphatic_target', 'chemical_keep', 'chemical_change',
+              'hydro_donor_source', 'hydro_acceptor_source', 'hydro_donor_acceptor_source', 'hydro_da_none_source',
+              'hydro_donor_target', 'hydro_acceptor_target', 'hydro_donor_acceptor_target', 'hydro_da_none_target',
+              'hydro_da_keep', 'hydro_da_change', 'polar_source', 'non_polar_source', 'polar_target',
+              'non_polar_target', 'polarity_keep', 'polarity_change', all_mut_field]
 
 
 def replace_new_line_in_ig_tree(t: PhyloTree):
@@ -186,16 +204,11 @@ def count_observed_in_node(gl: str, seq: str, regions: dict, gl_start_pos=0, noc
                         codon_seq, codon_gl = None, None
 
                     # print('codon_gl:', codon_gl, '\tcodon_seq:', codon_seq)  # TEMP
-                    mut = Mutation()
-                    mut.describe_mut_by_nuc(gl[i], seq[i])
-                    if codon_gl and codon_seq:
-                        mut.describe_mut_by_codon(codon_gl, codon_seq)
-                    mut.define_mut_pos(i, regions, nocdr3)
-
-                    # print(mut) # TEMP
+                    mut = Mutation(codon_gl, codon_seq, i, regions, nocdr3)
 
                     if mut:
-                        mut_arr.append(mut)
+                        mut_arr.append(mut.get_one_mut_list())
+
             if gl[i] != '-':  # Not a gap
                 non_gapped_i += 1
             if gl[i] == '-':  # Not a gap
@@ -215,54 +228,29 @@ def sum_mut_for_one_tree(mut_array: list, clone_id: str):
     dic = {
         general_utils.id_str: clone_id,
         'clone_id': general_utils.get_clone_number(clone_id),
-        'CDR': 0,
-        'FWR': 0,
-        'hydro_change': 0,
-        'charge_change': 0,
-        'hydro_keep': 0,
-        'charge_keep': 0,
-        'source_neutral': 0,
-        'dest_neutral': 0,
-        'mu_count_cdr_r': 0,
+        'mu_count_cdr_r': 0,  # Selection fields
         'mu_count_cdr_s': 0,
         'mu_count_fwr_r': 0,
         'mu_count_fwr_s': 0,
-        'all_mutations': len(mut_array)
     }
-    for mut in mut_array:  # For each mutaion
-        temp_mut_dict = mut.get_dict()
-        for key in temp_mut_dict:  # For each attribute
-            if temp_mut_dict[key]:  # If the attribute is True
-                if key in dic:
-                    dic[key] += 1
-                else:
-                    dic[key] = 1
-        if (mut.source_hydrophilic == mut.dest_hydrophilic) and (mut.source_hydrophobic == mut.dest_hydrophobic):
-            dic['hydro_keep'] += 1
-        else:
-            dic['hydro_change'] += 1
-        if (mut.source_positive == mut.dest_positive) and (mut.source_negative == mut.source_negative):
-            dic['charge_keep'] += 1
-        else:
-            dic['charge_change'] += 1
-        if (not mut.source_positive) and (not mut.source_negative):
-            dic['source_neutral'] += 1
-        if (not mut.dest_positive) and (not mut.dest_negative):
-            dic['dest_neutral'] += 1
 
-        if mut.cdr1 or mut.cdr2 or mut.cdr3:
-            dic['CDR'] += 1
-        elif mut.fwr1 or mut.fwr2 or mut.fwr3:
-            dic['FWR'] += 1
+    # Initializing all mutation fields
+    for field in all_fields:
+        if field != general_utils.id_str:
+            dic[field] = 0
 
-        # Selection fields
-        if mut.r and (mut.cdr1 or mut.cdr2 or mut.cdr3):  # Including the CDR3 region and later compatibility to shazam
+    for mut in mut_array:  # For each mutation
+        dic[all_mut_field] += 1
+        for field in all_fields:
+            if field in mut:
+                dic[field] += 1
+        if ('CDR' in mut) and ('replacement' in mut):
             dic['mu_count_cdr_r'] += 1
-        if mut.s and (mut.cdr1 or mut.cdr2):
+        elif ('CDR' in mut) and ('silent' in mut):
             dic['mu_count_cdr_s'] += 1
-        if mut.r and (mut.fwr1 or mut.fwr2 or mut.fwr3):
+        elif ('FWR' in mut) and ('replacement' in mut):
             dic['mu_count_fwr_r'] += 1
-        if mut.s and (mut.fwr1 or mut.fwr2 or mut.fwr3):
+        elif ('FWR' in mut) and ('silent' in mut):
             dic['mu_count_fwr_s'] += 1
 
     return dic

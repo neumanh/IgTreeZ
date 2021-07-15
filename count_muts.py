@@ -39,26 +39,14 @@ def order_mut_df_columns(df: pd.DataFrame, log_object: Logger, sample_name: str)
     # Inserting the sample column in the beginning of the dataframe
     df[general_utils.sample_str] = sample_name
 
-    all_columns = [
-        general_utils.sample_str, general_utils.id_str,  # General features
-        'nodes', 'sequences', 'source_a', 'source_c', 'source_g', 'source_t', 'transition', 'transversion',
-        # Nucleotide features
-        'source_hydrophilic', 'source_hydrophobic', 'dest_hydrophilic', 'dest_hydrophobic',  # Hydropathy 1
-        'hydro_keep', 'hydro_change',  # Hydropathy 2
-        'source_neutral', 'source_negative', 'source_positive',  # Charge 1
-        'dest_neutral', 'dest_negative', 'dest_positive',  # Charge 2
-        'charge_keep', 'charge_change',  # Charge 3
-        'r', 's', 'cdr1', 'cdr2', 'cdr3', 'CDR', 'fwr1', 'fwr2', 'fwr3', 'FWR',  # Replace, silent, and position
-        'all_mutations'
-    ]
-
     all_shazam_columns = [general_utils.sample_str, general_utils.id_str, 'clone_id', 'clonal_germline',
-                          'mu_count_cdr_r', 'mu_count_cdr_s', 'mu_count_fwr_r', 'mu_count_fwr_s', 'cdr3_end', 'sequences']
+                          'mu_count_cdr_r', 'mu_count_cdr_s', 'mu_count_fwr_r', 'mu_count_fwr_s',
+                          'cdr3_end', 'sequences']
 
     df_columns = df.columns.tolist()
 
     # Collecting the df columns by the defined order
-    for col in all_columns:
+    for col in mut_utils.all_fields:
         if col in df_columns:
             new_columns.append(col)
 
