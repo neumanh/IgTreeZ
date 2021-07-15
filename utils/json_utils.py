@@ -88,32 +88,39 @@ def get_tree_and_seqs(clone_json_object: dict, log_object: Logger):
 
     t = general_utils.create_tree(tree_json_obj['newick'], log_object)
 
-    t.id = clone_id
-    t.sequence = gl
+    if t:
 
-    # Attaching the sequences
-    nodes = get_nodes_dict(tree_json_obj)
+        t.id = clone_id
+        t.sequence = gl
 
-    seq_num = 0  # SThe sequences counter
-    # Going from up to down
-    for node in t.traverse("preorder"):
-        if hasattr(node, 'name') and (node.name in nodes):
-            node.sequence = nodes[node.name].replace('.', '-').upper()
-            seq_num += 1
-        # If the node is identical to its father
-        elif (node.get_distance(node.up) == 0) and (hasattr(node.up, 'sequence')):
-            node.sequence = node.up.sequence.replace('.', '-').upper()
+        # Attaching the sequences
+        nodes = get_nodes_dict(tree_json_obj)
 
-    # Generating the missing sequences
-    for node in t.traverse("postorder"):  # Going from leaves to root
-        if not hasattr(node, 'sequence'):
-            generated_seq = tree_utils.generate_missing_sequence(node.children, node.up, log_object)
-            if generated_seq:
-                node.sequence = generated_seq
-            else:
-                print('Warning: Could not generate sequence for', node.name)
-                alright_flag = False
-    t.seq_num = seq_num
+        seq_num = 0  # SThe sequences counter
+        # Going from up to down
+        for node in t.traverse("preorder"):
+            if hasattr(node, 'name') and (node.name in nodes):
+                node.sequence = nodes[node.name].replace('.', '-').upper()
+                seq_num += 1
+            # If the node is identical to its father
+            elif node != t:  # This is not the root
+                if (node.get_distance(node.up) == 0) and (hasattr(node.up, 'sequence')):
+                    node.sequence = node.up.sequence.replace('.', '-').upper()
+
+        # Generating the missing sequences
+        for node in t.traverse("postorder"):  # Going from leaves to root
+            if not hasattr(node, 'sequence'):
+                generated_seq = tree_utils.generate_missing_sequence(node.children, node.up, log_object)
+                if generated_seq:
+                    node.sequence = generated_seq
+                else:
+                    log_object.warning(f'Could not generate sequence for {node.name}')
+                    alright_flag = False
+        t.seq_num = seq_num
+
+    else:
+        log_object.error(f'Could not create the clone {clone_id}')
+        alright_flag = False
 
     if not alright_flag:
         t = None
