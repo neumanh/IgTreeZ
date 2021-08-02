@@ -127,16 +127,21 @@ def get_tree_and_seqs(clone_json_object: dict, log_object: Logger):
     return t
 
 
-def collect_trees_and_seqs_from_scheme(json_file, log_object: Logger):
+def collect_trees_and_seqs_from_scheme(args, log_object: Logger):
     """
     Collects the Newick trees and corresponding sequences from the scheme file and returns a list of trees
     (linked to sequences).
-    :param json_file: An AIRR scheme file
+    :param args: The input arguments, including the AIRR scheme file
     :param log_object: The Logger object.
     :return: A list of trees. Each tree hols the clone id in as t.id
     """
+    json_file = args.json
+
     if not log_object:
         log_object = general_utils.create_general_log_object()
+
+    if args.illumina:
+        log_object.warning('The parameter \'-illumina\' is ignored for AIRR scheme analysis')
 
     with open(json_file) as f:
         json_object = json.load(f)

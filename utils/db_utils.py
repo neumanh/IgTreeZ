@@ -123,12 +123,13 @@ def attach_gl_to_tree(t: Tree, gl_seq: str):
     return t
 
 
-def link_alignment_to_tree_by_df(t: Tree, df: pd.DataFrame, log_object=current_log_object):
+def link_alignment_to_tree_by_df(t: Tree, df: pd.DataFrame, log_object=current_log_object, illumina: bool=False):
     """
     Links sequences to tree
     :param df: The partial dataframe, containing only the relevant clone
     :param t: A ETE tree object
     :param log_object: The log object
+    :param illumina: Whether to replace colons with under-line
     :return: The updated tree, with the sequence attached
     """
     if not log_object:
@@ -138,8 +139,10 @@ def link_alignment_to_tree_by_df(t: Tree, df: pd.DataFrame, log_object=current_l
         t = general_utils.replace_new_line_in_ig_tree(t)
         all_seq_assigned_flag = True
 
-        # replacing the : with _ in the column name
-        df[_id_field] = df[_id_field].str.replace(':', '-')
+        if illumina:
+            # replacing the : and ; with _ in the column name - For illumina sequences
+            df[_id_field] = df[_id_field].str.replace(':', '_')
+            df[_id_field] = df[_id_field].str.replace(';', '_')
 
         # print(t.get_ascii(show_internal=True))
 
@@ -270,10 +273,13 @@ def find_seq_in_df(seq_name, df):
 
     seq = None
     # temp_df = df[SEQ_FIELD].where(df[ID_FIELD] == seq_name).dropna() # 25 % Time
+    # A direct hit
     temp_df = df[df[_id_field] == seq_name].dropna()  # TODO: NEED TO BE TESTED!!!
 
+    # If the node names contains more characters than the DB entry
     if not temp_df.empty:
         seq = temp_df[_seq_field].iloc[0]  # TODO: TEST
+
     else:
         for row in zip(df[_id_field], df[_seq_field]):
             if row[0] in seq_name:  # row[0] - df[ID_FIELD]
@@ -282,12 +288,13 @@ def find_seq_in_df(seq_name, df):
     return seq
 
 
-def generate_trees_and_clone_dfs(tree_list: list, df: pd.DataFrame, log_object: Logger = None):
+def generate_trees_and_clone_dfs(tree_list: list, df: pd.DataFrame, log_object: Logger = None, illumina = False):
     """
     Creates the tree lists and dataframe lists
     :param tree_list: The input tree list
     :param df: The input dataframe
     :param log_object: The Logger object
+    :param illumina: Whether to replace colons with under-line
     :return: Two lists - ete tree list, and pandas df list
     """
     if not log_object:
@@ -297,7 +304,7 @@ def generate_trees_and_clone_dfs(tree_list: list, df: pd.DataFrame, log_object: 
         clone_num = general_utils.get_clone_number(t.id)
         clone_df = create_clone_df(df, clone_num)
 
-        yield t, clone_df, log_object
+        yield t, clone_df, log_object, illumina
 
 
 def create_clone_df(full_df: pd.DataFrame, clone_number: int):
@@ -339,7 +346,7 @@ def attach_seqs_by_df(args, log_object: Logger = None):
         with mp.Pool(number_of_workers) as pool:
             # Using the generate_trees_and_clone_dfs generator
             trees = pool.starmap(link_alignment_to_tree_by_df,
-                                 generate_trees_and_clone_dfs(tree_list, df, log_object))
+                                 generate_trees_and_clone_dfs(tree_list, df, log_object, args.illumina))
     else:
         general_utils.handle_errors(f'Could not create a dataframe from the file {args.database}', log_object,
                                     exit_stat=True)

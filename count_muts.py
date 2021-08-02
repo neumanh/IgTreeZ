@@ -79,7 +79,7 @@ def count_obs_func(args):
 
     if args.json:
         import utils.json_utils as json_utils
-        linked_trees = json_utils.collect_trees_and_seqs_from_scheme(args.json, log_object)
+        linked_trees = json_utils.collect_trees_and_seqs_from_scheme(args, log_object)
 
     if args.database:
         linked_trees = db_utils.attach_seqs_by_df(args, log_object)

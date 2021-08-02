@@ -55,13 +55,13 @@ def attach_gl_seqs(t: Tree, sequences_file: str, gl):
     return t
 
 
-def process_sequences_names(sequence_file):
+def process_sequences_names(sequence_file: str):
     """
     Processes the nodes names, for IgTree input files
     :param sequence_file: The sequences file
     :return: The output file names
     """
-    out_file = os.path.basename(sequence_file) + "_updated.fasta"
+    out_file = os.path.basename(sequence_file) + "_names-updated.fasta"
     updt_records = []
     for record in SeqIO.parse(sequence_file, "fasta"):
         updated_record_name = record.id.replace(":", "_")
@@ -101,13 +101,14 @@ def get_seq_from_dict(node_name: str, seq_dict: dict):
     return seq
 
 
-def link_alignment_to_tree(fasta_file: str, t: Tree, gl_name: str, log_object: Logger = None):
+def link_alignment_to_tree(fasta_file: str, t: Tree, gl_name: str, log_object: Logger = None, illumina: str = False):
     """
     Links sequences to tree
     :param fasta_file: the IgTree input txt file
     :param t: An ETE3 Tree object
     :param gl_name: the GL name
     :param log_object: The Logger object
+    :param illumina: Whether to replace colons with under-line
     :return: a tree that contains the aligned sequences
     """
 
@@ -117,8 +118,11 @@ def link_alignment_to_tree(fasta_file: str, t: Tree, gl_name: str, log_object: L
     # Saving the tree id
     tree_id = t.id
 
-    # Processing the fasta file
-    temp_file = process_sequences_names(fasta_file)
+    if illumina:
+        # Processing the fasta file
+        temp_file = process_sequences_names(fasta_file)
+    else:
+        temp_file = fasta_file
 
     # Load the tree
     try:
@@ -129,16 +133,13 @@ def link_alignment_to_tree(fasta_file: str, t: Tree, gl_name: str, log_object: L
         t = None
         alright_flag = False
         general_utils.handle_errors(f'Could not create a PhyloTree object for {tree_id}: {e}', log_object)
-    finally:
-        # Removing the temporary file
-        os.remove(temp_file)
 
     if t:
         # Attaching the clone id to the tree
         t = general_utils.replace_new_line_in_ig_tree(t)
 
         # Attaching the GL sequence to the tree
-        gl_seq = find_gl_seq_in_fasta(fasta_file, gl_name)
+        gl_seq = find_gl_seq_in_fasta(temp_file, gl_name)
         if gl_seq:
             t.sequence = gl_seq
         else:
@@ -149,7 +150,8 @@ def link_alignment_to_tree(fasta_file: str, t: Tree, gl_name: str, log_object: L
         # t = attach_gl_seqs(t, fasta_file, gl_name)
 
         # For backing up the linking
-        seq_dict = get_seqs_dict(fasta_file)
+        seq_dict = get_seqs_dict(temp_file)
+        print(seq_dict)  # TEMP
 
         if hasattr(t, 'sequence'):
             seq_num = 0  # The sequences counter
@@ -162,10 +164,11 @@ def link_alignment_to_tree(fasta_file: str, t: Tree, gl_name: str, log_object: L
                 elif (node.get_distance(node.up) == 0) and (hasattr(node.up, 'sequence')):
                     node.sequence = node.up.sequence.replace('.', '-').upper()
 
-                elif hasattr(node, 'name') and get_seq_from_dict(node.name, seq_dict):
-                    seq = get_seq_from_dict(node.name, seq_dict)
-                    node.sequence = seq.replace('.', '-').upper()
-                    seq_num += 1  # A sequence
+                elif hasattr(node, 'name'):
+                    seq_form_dict = get_seq_from_dict(node.name, seq_dict)
+                    if seq_form_dict:
+                        node.sequence = seq_form_dict.replace('.', '-').upper()
+                        seq_num += 1  # A sequence
 
             for node in t.traverse('postorder'):  # Going from leaves to root to generate missing sequences
                 if not hasattr(node, 'sequence'):  # this in a hypothetical node w/o sequence
@@ -178,8 +181,14 @@ def link_alignment_to_tree(fasta_file: str, t: Tree, gl_name: str, log_object: L
 
             t.seq_num = seq_num
 
+    # Removing teh temporary fasta file
+    if temp_file != fasta_file:
+        # Removing the temporary file
+        os.remove(temp_file)
+
     if not alright_flag:
         t = None
+
     return t
 
 
@@ -212,6 +221,7 @@ def attach_trees_using_fasta(args, log_object: Logger = None):
         with mp.Pool(number_of_workers) as pool:
             # Linking the trees with tha fasta files in prallel
             linked_trees = pool.starmap(link_alignment_to_tree,
-                                        zip(seq_list, tree_list, repeat(args.gl_name), repeat(log_object)))
+                                        zip(seq_list, tree_list, repeat(args.gl_name), repeat(log_object),
+                                            repeat(args.illumina)))
 
     return linked_trees

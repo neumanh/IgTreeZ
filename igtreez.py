@@ -101,12 +101,15 @@ def get_arg_parser():
                             help='Do not analyze the CDR3 region. Relevant only with the -d parameter.')
     parser_mut.add_argument('--selection', action='store_true',
                             help='Create an output table for the selection analysis using the ShazaM package')
+    parser_mut.add_argument('--plot', action='store_true', help='Creates plots')
+    parser_mut.add_argument('--illumina', action='store_true', help='If the sequence names contain colons (:) '
+                                                                    'or semicolons (;), they will be replaced '
+                                                                    'in under-lines')
     parser_mut.add_argument('-cf', '--clone_field', help='The clone field. default - as in ChangeO / AIRR format')
     parser_mut.add_argument('-sf', '--seq_field', help=f'The sequence field. default - as in ChangeO / AIRR format')
     parser_mut.add_argument('-gf', '--gl_field', help=f'The germline field. default - as in ChangeO / AIRR format')
     parser_mut.add_argument('-if', '--id_field', help=f'The sequence ID field. default - as in ChangeO / AIRR format')
-    parser_mut.add_argument('-gl', '--gl_name', help=f'The germline name. default - naive', default='naive')
-    parser_mut.add_argument('--plot', action='store_true', help='Creates plots')
+    parser_mut.add_argument('-gl', '--gl_name', help=f'The germline name. default - GL', default='GL')
     parser_mut.set_defaults(function=call_mutations)
 
     # The mtree analysis
