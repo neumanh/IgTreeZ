@@ -5,8 +5,9 @@ Plots Ig statistics
 
 # Info
 __author__ = 'Hadas Neuman'
-__version__ = '1.61'
-__date__ = '19/10/20'
+__mail__ = 'hadas.doron@gmail.com'
+__version__ = '1.7.0'
+__date__ = '3/8/21'
 
 import multiprocessing as mp
 from argparse import ArgumentParser
@@ -58,7 +59,7 @@ def get_parent():
     parser.add_argument('--ncors', help='The number of CPU cores. default ' + str(accessible_cores),
                         default=accessible_cores)
     parser.add_argument('--silent', action='store_true', help='Avoid output')
-    parser.add_argument('--version', action='version', version='%(prog)s:' + ' %s:%s' % (__version__, __date__))
+    parser.add_argument('--version', action='version', version='%(prog)s:' + ' %s %s' % (__version__, __date__))
 
     return parser
 
