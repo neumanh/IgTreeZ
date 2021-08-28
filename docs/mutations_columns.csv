@@ -1,0 +1,83 @@
+﻿,Name,Description
+1,sample,"Sample name, as given by the user"
+2,Tree ID,"A numerical tree ID, taken from file name or tree name (in AIRR scheme file)"
+3,nodes,Number of nodes in tree
+4,sequences,Number of observed nodes in tree
+5,source_a,Number of mutations from adenosine 
+6,source_c,Number of mutations from cytidine 
+7,source_g,Number of mutations from guanosine
+8,source_t,Number of mutations from thymidine
+9,transition,Number of mutations that involve transition
+10,transversion,Number of mutations that involve transversion
+11,replacement,Number of replacement mutation
+12,silent,Number of silent mutation
+13,cdr1,Number of mutations in the CDR1 region
+14,cdr2,Number of mutations in the CDR2 region
+15,cdr3,Number of mutations in the CDR3 region
+16,CDR,Number of mutations in all CDRs
+17,fwr1,Number of mutations in the FWR1 region
+18,fwr2,Number of mutations in the FWR2 region
+19,fwr3,Number of mutations in the FWR3 region
+20,FWR,Number of mutations in all FWRs
+21,positive_source,Number of mutations that start in positive AAs
+22,negative_source,Number of mutations that start in negative AAs
+23,neutral_charge_source,Number of mutations that start in a neutral charge AAs
+24,positive_target,Number of mutations into positive AAs
+25,negative_target,Number of mutations into negative AAs
+26,neutral_charge_target,Number of mutations into neutral charge AAs
+27,charge_keep,Number of REPLACEMENT mutations that keep the same charge
+28,charge_change,Number of mutations that change the charge
+29,hydrophobic_source,Number of mutations that start in hydrophobic AAs
+30,hydrophilic_source,Number of mutations that start in hydrophilic AAs
+31,neutral_hydro_source,Number of mutations that start in neutral-hydropathy AAs
+32,hydrophobic_target,Number of mutations into hydrophobic AAs
+33,hydrophilic_target,Number of mutations into hydrophilic AAs
+34,neutral_hydro_target,Number of mutations into neutral-hydropathy AAs
+35,hydro_keep,Number of REPLACEMENT mutations that keep the same hydropathy
+36,hydro_change,Number of mutations that change the  hydropathy
+37,vs_volume_source,Number of mutations that start in very small volume AAs
+38,small_volume_source,Number of mutations that start in small volume AAs
+39,medium_volume_source,Number of mutations that start in medium volume AAs
+40,large_volume_source,Number of mutations that start in large volume AAs
+41,vl_volume_source,Number of mutations that start in very large volume AAs
+42,vs_volume_target,Number of mutations into very small volume AAs
+43,small_volume_target,Number of mutations into small volume AAs
+44,medium_volume_target,Number of mutations into medium volume AAs
+45,large_volume_target,Number of mutations into large volume AAs
+46,vl_volume_target,Number of mutations into very large volume AAs
+47,volume_decrease,Number of mutations that decrease the AA volume
+48,volume_increase,Number of mutations that increase the AA volume
+49,volume_keep,Number of REPLACEMENT mutations that keep the AA volume
+50,amide_source,Number of mutations that start in amide AAs
+51,acidic_source,Number of mutations that start in acidic AAs
+52,basic_source,Number of mutations that start in basic AAs
+53,hydroxyl_source,Number of mutations that start in hydroxyl AAs
+54,sulfur_source,Number of mutations that start in sulfur AAs
+55,aromatic_source,Number of mutations that start in aromatic AAs
+56,aliphatic_source,Number of mutations that start in aliphatic AAs
+57,amide_target,Number of mutations into amide AAs
+58,acidic_target,Number of mutations into acidic AAs
+59,basic_target,Number of mutations into basic AAs
+60,hydroxyl_target,Number of mutations into hydroxyl AAs
+61,sulfur_target,Number of mutations into sulfur AAs
+62,aromatic_target,Number of mutations into aromatic AAs
+63,aliphatic_target,Number of mutations into aliphatic AAs
+64,chemical_keep,Number of REPLACEMENT mutations that keep the AA chemical properties
+65,chemical_change,Number of mutations that change the AA chemical properties
+66,hydro_donor_source,Number of mutations that start in hydrogen donor AAs
+67,hydro_acceptor_source,Number of mutations that start in hydrogen acceptor AAs
+68,hydro_donor_acceptor_source,Number of mutations that start in hydrogen donor and acceptor AAs
+69,hydro_da_none_source,Number of mutations that start in AAs that have no hydrogen donor or acceptor atoms
+70,hydro_donor_target,Number of mutations into hydrogen donor AAs
+71,hydro_acceptor_target,Number of mutations into hydrogen acceptor AAs
+72,hydro_donor_acceptor_target,Number of mutations into hydrogen donor and acceptor AAs
+73,hydro_da_none_target,Number of mutationsinto AAs that have no hydrogen donor or acceptor atoms
+74,hydro_da_keep,Number of REPLACEMENT mutations that keep the AA hydrogen-donor-acceptor tendency
+75,hydro_da_change,Number of mutations that change the AA hydrogen-donor-acceptor tendency
+76,polar_source,Number of mutations that start in polar AAs
+77,non_polar_source,Number of mutations that start in non-polar AAs
+78,polar_target,Number of mutations into polar AAs
+79,non_polar_target,Number of mutations into non-polar AAs
+80,polarity_keep,Number of REPLACEMENT mutations that keep the AA polarity
+81,polarity_change,Number of mutations that change the AA polarity
+82,all_mutations,All the mutations in the tree

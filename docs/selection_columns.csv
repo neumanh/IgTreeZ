@@ -1,0 +1,12 @@
+﻿,Name,Description
+1,sample,"Sample name, as given by the user"
+2,Tree ID,"A numerical tree ID, taken from file name or tree name (in AIRR scheme file)"
+3,nodes,Number of nodes in the tree
+4,leaves,Number of leaves (terminal nodes) in the tree
+5,od_avg,The average number of children per node
+6,rootd,The number of branches emerging from the root
+7,drsn_min,The minimum distances between the root to splits node
+8,dasn_min,The minimum distances between two consecutive splits on the same path
+9,trunk,Length of tree trunk from root to the first split node (=number of shared mutations)
+10,dlfsn_avg,The average distance from a leaf to the first split node/fork
+11,pl_min,Minimum path from the root to a leaf (= the minimum number of mutations per leaf)

@@ -1,0 +1,76 @@
+﻿Figure name,Description
+XXX_CDR_region_bar_plot.pdf,A bar plot of the mutation count in the CDR1/2/3 regions in the repertoire
+XXX_CDR_region_box_plot.pdf,A box plot of the mutation count in the CDR1/2/3 regions per tree
+XXX_CDR_region_pie_plot.pdf,A pie plot of the distribution of the mutations in the CDR1/2/3 regions in the repertoire
+XXX_charge_change_bar_plot.pdf,"A bar plot of the number of replacement mutations that lead to amino-acid charge change, relative to the number of mutations that did not, in the repertoire"
+XXX_charge_change_box_plot.pdf,"A box plot of the number of replacement mutations that lead to amino-acid charge change, relative to the number of mutations that did not, per tree"
+XXX_charge_change_pie_plot.pdf,"A pie plot of the distribution of the replacement mutations that lead to amino-acid charge change, relative to the number of mutations that did not, in the repertoire"
+XXX_charge_target_bar_plot.pdf,A bar plot of the number of mutations that lead to positive/negative/neutral amino acids in the repertoire
+XXX_charge_target_box_plot.pdf,A box plot of the number of mutations that lead to positive/negative/neutral amino acids per tree
+XXX_charge_target_pie_plot.pdf,A pie plot of the distribution of mutations that lead to positive/negative/neutral amino acids in the repertoire
+XXX_charge_source_bar_plot.pdf,A bar plot of the number of mutations that start from positive/negative/neutral amino acids in the repertoire
+XXX_charge_source_box_plot.pdf,A box plot of the number of mutations that start from positive/negative/neutral amino acids per tree
+XXX_charge_source_pie_plot.pdf,A pie plot of the distribution of mutations that start from positive/negative/neutral amino acids in the repertoire
+XXX_all_regions_bar_plot.pdf,A bar plot of the mutation count in the CDR1/2/3 and FWR1/2/3 regions in the repertoire
+XXX_all_regions_box_plot.pdf,A box plot of the mutation count in the CDR1/2/3 and FWR1/2/3 regions per tree
+XXX_all_regions_pie_plot.pdf,A pie plot of the distribution of the mutations in the CDR1/2/3 and FWR1/2/3 regions in the repertoire
+XXX_FWR_region_bar_plot.pdf,A bar plot of the mutation count in the FWR1/2/3 regions in the repertoire
+XXX_FWR_region_box_plot.pdf,A box plot of the mutation count in the FWR1/2/3 regions per tree
+XXX_FWR_region_pie_plot.pdf,A pie plot of the distribution of the mutations in the FWR1/2/3 regions in the repertoire
+XXX_hydro_change_bar_plot.pdf,"A bar plot of the number of replacement mutations that lead to amino-acid hydrophobic/hydrophilic change, relative to the number of mutations that did not, in the repertoire"
+XXX_hydro_change_box_plot.pdf,"A box plot of the number of replacement mutations that lead to amino-acid hydrophobic/hydrophilic change, relative to the number of mutations that did not, per tree"
+XXX_hydro_change_pie_plot.pdf,"A pie plot of the distribution of the replacement mutations that lead to amino-acid hydrophobic/hydrophilic change, relative to the number of mutations that did not, in the repertoire"
+XXX_hydro_target_bar_plot.pdf,A bar plot of the number of mutations that lead to hydrophobic/hydrophilic amino acids in the repertoire
+XXX_hydro_target_box_plot.pdf,A box plot of the number of mutations that lead to hydrophobic/hydrophilic amino acids per tree
+XXX_hydro_target_pie_plot.pdf,A pie plot of the distribution of mutations that lead to hydrophobic/hydrophilic amino acids in the repertoire
+XXX_hydro_source_bar_plot.pdf,A bar plot of the number of mutations that start from hydrophobic/hydrophilic amino acids in the repertoire
+XXX_hydro_source_box_plot.pdf,A box plot of the number of mutations that start from hydrophobic/hydrophilic amino acids per tree
+XXX_hydro_source_pie_plot.pdf,A pie plot of the distribution of mutations that start from hydrophobic/hydrophilic amino acids in the repertoire
+XXX_nucleotide_source_bar_plot.pdf,A bar plot of the number of mutations that start from adenine/cytosine/guanine/thymine in the repertoire
+XXX_nucleotide_source_box_plot.pdf,A box plot of the number of mutations that start from adenine/cytosine/guanine/thymine per tree
+XXX_nucleotide_source_pie_plot.pdf,A pie plot of the distribution of mutations that start from adenine/cytosine/guanine/thymine in the repertoire
+XXX_region_bar_plot.pdf,A bar plot of the mutation count in the CDR and FWR regions in the repertoire
+XXX_region_box_plot.pdf,A box plot of the mutation count in the CDR and FWR regions per tree
+XXX_region_pie_plot.pdf,A pie plot of the distribution of the mutations in the CDR and FWR regions in the repertoire
+XXX_rs_bar_plot.pdf,A bar plot of the number of replacement/silent mutations in the repertoire
+XXX_rs_box_plot.pdf,A box plot of the number of replacement/silent mutations per tree
+XXX_rs_pie_plot.pdf,A pie plot of the distribution of replacement/silent mutations in the repertoire
+XXX_trans_bar_plot.pdf,A bar plot of the number of transition/transversion mutations in the repertoire
+XXX_trans_box_plot.pdf,A box plot of the number of transition/transversion mutations per tree
+XXX_trans_pie_plot.pdf,A pie plot of the distribution of transition/transversion mutations in the repertoire
+XXX_chemical_change_bar_plot.pdf,"A bar plot of the number of replacement mutations that lead to amino-acid chemical change, relative to the number of mutations that did not, in the repertoire"
+XXX_chemical_change_box_plot.pdf,"A box plot of the number of replacement mutations that lead to amino-acid chemical change, relative to the number of mutations that did not, per tree"
+XXX_chemical_change_pie_plot.pdf,"A pie plot of the distribution of the replacement mutations that lead to amino-acid chemical change, relative to the number of mutations that did not, in the repertoire"
+XXX_chemical_target_bar_plot.pdf,A bar plot of the number of mutations that lead to aliphatic/aromatic/sulfur/hydroxyl/basic/acidic/amide amino acids in the repertoire
+XXX_chemical_target_box_plot.pdf,A box plot of the number of mutations that lead to aliphatic/aromatic/sulfur/hydroxyl/basic/acidic/amide amino acids per tree
+XXX_chemical_target_pie_plot.pdf,A pie plot of the distribution of mutations that lead to aliphatic/aromatic/sulfur/hydroxyl/basic/acidic/amide amino acids in the repertoire
+XXX_chemical_source_bar_plot.pdf,A bar plot of the number of mutations that start from aliphatic/aromatic/sulfur/hydroxyl/basic/acidic/amide amino acids in the repertoire
+XXX_chemical_source_box_plot.pdf,A box plot of the number of mutations that start from aliphatic/aromatic/sulfur/hydroxyl/basic/acidic/amide amino acids per tree
+XXX_chemical_source_pie_plot.pdf,A pie plot of the distribution of mutations that start from aliphatic/aromatic/sulfur/hydroxyl/basic/acidic/amide amino acids in the repertoire
+XXX_hydro_da_change_bar_plot.pdf,"A bar plot of the number of replacement mutations that lead to amino-acid hydrogen donating/accepting change, relative to the number of mutations that did not, in the repertoire"
+XXX_hydro_da_change_box_plot.pdf,"A box plot of the number of replacement mutations that lead to amino-acid hydrogen donating/accepting change, relative to the number of mutations that did not, per tree"
+XXX_hydro_da_change_pie_plot.pdf,"A pie plot of the distribution of the replacement mutations that lead to amino-acid hydrogen donating/accepting change, relative to the number of mutations that did not, in the repertoire"
+XXX_hydro_donor_acceptor_target_bar_plot.pdf,A bar plot of the number of mutations that lead to hydrogen donating/accepting amino acids in the repertoire
+XXX_hydro_donor_acceptor_target_box_plot.pdf,A box plot of the number of mutations that lead to hydrogen donating/accepting amino acids per tree
+XXX_hydro_donor_acceptor_target_pie_plot.pdf,A pie plot of the distribution of mutations that lead to hydrogen donating/accepting amino acids in the repertoire
+XXX_hydro_donor_acceptor_source_bar_plot.pdf,A bar plot of the number of mutations that start from hydrogen donating/accepting amino acids in the repertoire
+XXX_hydro_donor_acceptor_source_box_plot.pdf,A box plot of the number of mutations that start from hydrogen donating/accepting amino acids per tree
+XXX_hydro_donor_acceptor_source_pie_plot.pdf,A pie plot of the distribution of mutations that start from hydrogen donating/accepting amino acids in the repertoire
+XXX_polarity_change_bar_plot.pdf,"A bar plot of the number of replacement mutations that lead to amino-acid polarity change, relative to the number of mutations that did not, in the repertoire"
+XXX_polarity_change_box_plot.pdf,"A box plot of the number of replacement mutations that lead to amino-acid polarity change, relative to the number of mutations that did not, per tree"
+XXX_polarity_change_pie_plot.pdf,"A pie plot of the distribution of the replacement mutations that lead to amino-acid polarity change, relative to the number of mutations that did not, in the repertoire"
+XXX_polarity_target_bar_plot.pdf,A bar plot of the number of mutations that lead to polar/non-polar amino acids in the repertoire
+XXX_polarity_target_box_plot.pdf,A box plot of the number of mutations that lead to polar/non-polar amino acids per tree
+XXX_polarity_target_pie_plot.pdf,A pie plot of the distribution of mutations that lead to polar/non-polar amino acids in the repertoire
+XXX_polarity_source_bar_plot.pdf,A bar plot of the number of mutations that start from polar/non-polar amino acids in the repertoire
+XXX_polarity_source_box_plot.pdf,A box plot of the number of mutations that start from polar/non-polar amino acids per tree
+XXX_polarity_source_pie_plot.pdf,A pie plot of the distribution of mutations that start from polar/non-polar amino acids in the repertoire
+XXX_volume_change_bar_plot.pdf,"A bar plot of the number of replacement mutations that lead to amino-acid volume change, relative to the number of mutations that did not, in the repertoire"
+XXX_volume_change_box_plot.pdf,"A box plot of the number of replacement mutations that lead to amino-acid volume change, relative to the number of mutations that did not, per tree"
+XXX_volume_change_pie_plot.pdf,"A pie plot of the distribution of the replacement mutations that lead to amino-acid volume change, relative to the number of mutations that did not, in the repertoire"
+XXX_volume_target_bar_plot.pdf,A bar plot of the number of mutations that lead to very large/large/medium/small/very small amino acids in the repertoire
+XXX_volume_target_box_plot.pdf,A box plot of the number of mutations that lead to very large/large/medium/small/very small amino acids per tree
+XXX_volume_target_pie_plot.pdf,A pie plot of the distribution of mutations that lead to very large/large/medium/small/very small amino acids in the repertoire
+XXX_volume_source_bar_plot.pdf,A bar plot of the number of mutations that start from very large/large/medium/small/very small amino acids in the repertoire
+XXX_volume_source_box_plot.pdf,A box plot of the number of mutations that start from very large/large/medium/small/very small amino acids per tree
+XXX_volume_source_pie_plot.pdf,A pie plot of the distribution of mutations that start from very large/large/medium/small/very small amino acids in the repertoire

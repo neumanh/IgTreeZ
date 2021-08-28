@@ -1,0 +1,39 @@
+﻿Name,Explanation
+XXX_population_count.pdf,A bar plot of the number of accurances of each population.
+XXX_population_count_frequency.pdf,A bar plot of the number of different populations in each tree.
+XXX_population_levels.pdf,A box plot of the number of mutations from root to each population accurances.
+XXX_populations_pie.pdf,A pie plot of the relative part of each population in the tree repetoire.
+XXX_transition_count.pdf,The number of times each transition is found in the tree repetoire.
+XXX_transition_count_normalized_by_destination.pdf,"The number of times each transition is found in the tree repetoire, divided in the number of times the target population was found in the given trees, and multiplied by a constant."
+XXX_transition_count_normalized_by_source.pdf,"The number of times each transition is found in the tree repetoire, divided in the number of times the source population was found in the given trees, and multiplied by a constant."
+XXX_transitions_pie.pdf,A pie plot of the relative part of each transition in all the transtions found.
+XXX_transition_pie_normalized_by_destination.pdf,"A pie plot of the relative part of each transition in all the transtions found, divided in the number of times the target population was found in the given trees, and multiplied by a constant."
+XXX_transition_pie_normalized_by_source.pdf,"A pie plot of the relative part of each transition in all the transtions found, divided in the number of times the source population was found in the given trees, and multiplied by a constant."
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
