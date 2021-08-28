@@ -123,7 +123,7 @@ Inside it, it creates these CSV files:
 
 #### Plots
 In addition to the mutations count, the program can generate discriptive plots using the `--plot` parameter.   
-All the plots are created in the local directory *IgTreeZ_output/example_name/mutation_plots*. The program generates more than $$$$$ plots for each analysis. A short explanation on each plot can be found [here](./docs/mutations_plots.csv)
+All the plots are created in the local directory *IgTreeZ_output/example_name/mutation_plots*. The program generates more than 70 plots for each analysis. A short explanation on each plot can be found [here](./docs/mutations_plots.csv)
 
 For example - a pie that describes the distribution of the mutations in the CDRs and FWRs in the repertoire:
 ![all_regions_pie_plot](./images/H1_all_regions_pie_plot.png)
