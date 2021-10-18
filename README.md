@@ -18,11 +18,11 @@ To use the 'draw' sub-program, you will need [Graphviz](https://graphviz.org/dow
    ```sh
    git clone https://github.com/neumanh/IgTreeZ.git
    ```
-2. Download [IgTreeZ_1.7.0.tar.gz](./IgTreeZ_1.7.0.tar.gz). To extract the file in the local directory, use
+2. Download [IgTreeZ_1.7.1.tar.gz](./IgTreeZ_1.7.1.tar.gz). To extract the file in the local directory, use
    ```sh
    tar -zxvf IgTreeZ*.tar.gz
    ```
-3. Download [IgTreeZ_1.7.0.zip](./IgTreeZ_1.7.0.zip). To extract the file in the local directory, use
+3. Download [IgTreeZ_1.7.1.zip](./IgTreeZ_1.7.1.zip). To extract the file in the local directory, use
    ```sh
    unzip IgTreeZ*.zip
    ```
@@ -107,7 +107,7 @@ igtreez.py mutations -n example_name -t ../examples/*nw -d ../examples/F1-contro
 Multiple output datasets can be input to an Rscript that quantifies the selection using the [ShazaM](https://shazam.readthedocs.io/en/stable/vignettes/Baseline-Vignette/)'s selection test on the given mutation counts:
 
 ```sh
-Rscript run_shazam_on_trees_with_CDR3.r example_name1_for_selection.csv example_name2_for_selection.csv
+Rscript shazam_selection_on_igtreez_output.r example_name1_for_selection.csv example_name2_for_selection.csv
 ```
 
 If the script finds the 'CDR3_length' column in the datasets, it counts for the Ig sequence till the end of the CDR3 region.
@@ -333,7 +333,3 @@ Prof. Ramit Mehr ramit.mehr@biu.ac.il
 
 
 Project Link: [https://github.com/neumanh/IgTreeZ](https://github.com/neumanh/IgTreeZ)
-
-
-   
-
