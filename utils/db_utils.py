@@ -141,8 +141,8 @@ def link_alignment_to_tree_by_df(t: Tree, df: pd.DataFrame, log_object=current_l
 
         if illumina:
             # replacing the : and ; with _ in the column name - For illumina sequences
-            df[_id_field] = df[_id_field].str.replace(':', '_')
-            df[_id_field] = df[_id_field].str.replace(';', '_')
+            df[_id_field] = df[_id_field].str.replace(':', '-')
+            df[_id_field] = df[_id_field].str.replace(';', '-')
 
         # print(t.get_ascii(show_internal=True))
 

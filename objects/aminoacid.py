@@ -172,7 +172,7 @@ class AminoAcid:
         """
         # By IMGT's definition: http://www.imgt.org/IMGTeducation/Aide-memoire/_UK/aminoacids/IMGTclasses.html
         polar_aa = ['R', 'N', 'D', 'Q', 'E', 'H', 'K', 'S', 'T', 'Y']
-        # nonpolar_aa = ['A', 'C', 'G', 'I', 'L', 'M', 'F', 'P', 'W', 'V']
+        #nonpolar_aa = ['A', 'C', 'G', 'I', 'L', 'M', 'F', 'P', 'W', 'V']
 
         polarity = None
         if self.aa and (self.aa != '_'):  # Not a None or a stop codon

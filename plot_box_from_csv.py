@@ -9,9 +9,12 @@ __version__ = '1.0'
 __date__ = '13/10/20'
 
 # Imports
+from argparse import ArgumentParser
+
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from matplotlib import rcParams
 
 matplotlib.use('Agg')
@@ -58,7 +61,7 @@ def box_plot(dicti: dict, fig_name: str = 'figure.pdf', xlab: str = 'Transitions
             plt.setp(ax.get_xticklabels(), rotation=45,
                      horizontalalignment='right')  # Rotate in 90 degrees (vertically)
             plt.gcf().subplots_adjust(bottom=0.3)  # Add the bottom space
-        elif len(labels) > 3:
+        elif len(labels) > 4:
             plt.setp(ax.get_xticklabels(), rotation=30,
                      horizontalalignment='right')  # Rotate in 90 degrees (vertically)
             plt.gcf().subplots_adjust(bottom=0.15)  # Add the bottom space
@@ -76,31 +79,25 @@ def box_plot(dicti: dict, fig_name: str = 'figure.pdf', xlab: str = 'Transitions
         print("Could not create a boxplot for less than 2 populations")
 
 
-def bar_plot(dicti: dict, fig_name: str = 'bar_plot.pdf', xlab='Populations', ylab='Count', sum_flag: bool = False,
-             norm: bool = False):
+def bar_plot(dicti: dict, fig_name: str = 'bar_plot.pdf', xlab='Populations', ylab='Count', sum_flag=False):
     """
     Plots the bar plot of transition number
     :param fig_name: The output figure name
     :param dicti: The transition / population dictionary
     :param xlab: The x lable of the created graph
     :param ylab: The y lable of the created graph
-    :param sum_flag: Indicated weather to sum the data rather than counting it (for mutation analysis)
-    :param norm: For normalized array
+    :param sum_flag: Indicated weather to sum the data rather than counting it
     :return: None
     """
 
     # Collecting the data
-    if norm:
-        # Collect the data
-        count_data, labels = dict_to_lists(dicti)
-    else:
-        all_data, labels = dict_to_lists(dicti)
-        count_data = []
-        for data in all_data:  # Collecting the count data
-            if sum_flag:
-                count_data.append(np.sum(data))
-            else:  # Count the data
-                count_data.append(len(data))
+    all_data, labels = dict_to_lists(dicti)
+    count_data = []
+    for data in all_data:  # Collecting the count data
+        if sum_flag:
+            count_data.append(np.sum(data))
+        else:  # Count the data
+            count_data.append(len(data))
 
     fig, ax = plt.subplots()
     ax.bar(labels, count_data)
@@ -135,34 +132,46 @@ def get_color_arr(pops: list):
     :return:
     """
     colors = []
-    if pops:
-        delta = 1 / len(pops)
-        col = 0.0 + (delta / 2)
-        color_palt = plt.cm.Spectral
+    delta = 1 / len(pops)
+    col = 0.0 + (delta / 2)
+    color_palt = plt.cm.Spectral
 
-        for _ in pops:
-            colors.append(color_palt(col))
-            col = col + delta
+    for _ in pops:
+        colors.append(color_palt(col))
+        col = col + delta
     return colors
 
 
-def plot_hist(data: np.array, fig_name: str = 'pop_number_.pdf'):
+def norm_bar_plot(dicti: dict, fig_name: str = 'norm_bar_plot.pdf'):
     """
-
-    Plot a histogram of population count per tree
-    :param data: The number of populations int each tree
-    :param fig_name: The output figure name
+    Plots the bar plot of the normalized transition number
     :return: None
     """
-    unique, counts = np.unique(data, return_counts=True)
+    # Collect the data
+    count_data, labels = dict_to_lists(dicti)
 
-    data_dict = {}
-    i = 0
-    for key in unique:
-        data_dict[str(key)] = counts[i]
-        i += 1
+    fig, ax = plt.subplots()
+    ax.bar(labels, count_data)
 
-    bar_plot(data_dict, fig_name, xlab='# Populations in one tree', ylab='Count', norm=True)
+    xlab = 'Normalized Transitions'
+
+    # Adjusting the plot for large number of populations
+    if len(labels) > 20:
+        plt.setp(ax.get_xticklabels(), rotation=90)  # Rotate in 30 degrees
+    elif len(labels) > 15:
+        plt.setp(ax.get_xticklabels(), rotation=45, horizontalalignment='right')  # Rotate in 90 degrees (vertically)
+    elif len(labels) > 4:
+        plt.setp(ax.get_xticklabels(), rotation=30, horizontalalignment='right')  # Rotate in 90 degrees (vertically)
+
+    ax.set_xlabel(xlab)
+    ax.set_ylabel('Count')
+
+    # Adjusting the limits
+    plt.gcf().subplots_adjust(bottom=0.15)
+    plt.gcf().subplots_adjust(left=0.15)
+
+    plt.savefig(fig_name)
+    plt.close()
 
 
 def create_color_dict(pops):
@@ -328,6 +337,7 @@ def scatter_plot(vals: list, xlab, ylab, fig_name: str = 'scatter_plot.pdf'):
 
     fig, ax = plt.subplots()
 
+    labels = []
     for val in vals:
         label = val[0]
         x = val[1]
@@ -342,3 +352,55 @@ def scatter_plot(vals: list, xlab, ylab, fig_name: str = 'scatter_plot.pdf'):
     plt.savefig(fig_name)
 
     plt.close()
+
+
+def plot_box(args):
+    """
+    Plots a box plot of the input CSV file.
+    :param args: The input arguments.
+    :return: None
+    """
+    df = pd.read_csv(args.csv)
+    dic = {}
+    for col in df:
+        dic[col] = df[col].dropna().to_numpy()
+
+    fig_name = f'{args.csv}.pdf'
+
+    if args.sort:
+        new_dic = {}
+        for s_col in args.sort:
+            if s_col in dic:
+                new_dic[s_col] = dic[s_col]
+            else:
+                print(f'Warning: could not find the column {s_col} in the database')
+        dic = new_dic
+
+    box_plot(dic, fig_name, xlab='Population')
+
+    print('Saved to', fig_name)
+
+
+def get_arg_parser():
+    """
+    Defines the input and the output field help message
+    :return: The parser
+    """
+
+    desc = "Plots box from a CSV file"
+
+    # Define argument parser
+    local_parser = ArgumentParser(description=desc)
+    local_parser.add_argument('-c', '--csv', help='The CSV file to plot', required=True)
+    local_parser.add_argument('-s', '--sort', help='Sort the columns in the input order', nargs='+')
+    local_parser.add_argument('--version', action='version', version='%(prog)s:' + ' %s:%s' % (__version__, __date__))
+
+    return local_parser
+
+
+if __name__ == "__main__":
+    # Parse command line arguments
+    parser = get_arg_parser()
+    global_args = parser.parse_args()
+
+    plot_box(global_args)

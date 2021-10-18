@@ -64,8 +64,8 @@ def process_sequences_names(sequence_file: str):
     out_file = os.path.basename(sequence_file) + "_names-updated.fasta"
     updt_records = []
     for record in SeqIO.parse(sequence_file, "fasta"):
-        updated_record_name = record.id.replace(":", "_")
-        updated_record_name = updated_record_name.replace(";", "_")
+        updated_record_name = record.id.replace(":", "-")
+        updated_record_name = updated_record_name.replace(";", "-")
         record.id = updated_record_name
         new_record = SeqRecord(record.seq, updated_record_name, '', '')
         updt_records.append(new_record)

@@ -100,7 +100,8 @@ def count_obs_func(args):
         with mp.Pool(number_of_workers) as pool:
             # mut_dict_list = pool.map(mut_utils.count_observed_in_tree, linked_trees)
             mut_dict_list = pool.starmap(mut_utils.count_observed_in_tree,
-                                         zip(linked_trees, repeat(args.notrunk), repeat(args.nocdr3), repeat(log_object)))
+                                         zip(linked_trees, repeat(args.notrunk),
+                                             repeat(args.nocdr3), repeat(log_object)))
 
     else:
         general_utils.handle_errors('Could not link alignment to trees', log_object)

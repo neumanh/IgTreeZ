@@ -6,7 +6,7 @@ Plots Ig statistics
 # Info
 __author__ = 'Hadas Neuman'
 __mail__ = 'hadas.doron@gmail.com'
-__version__ = '1.7.0'
+__version__ = '1.7.1'
 __date__ = '3/8/21'
 
 import multiprocessing as mp
@@ -105,7 +105,7 @@ def get_arg_parser():
     parser_mut.add_argument('--plot', action='store_true', help='Creates plots')
     parser_mut.add_argument('--illumina', action='store_true', help='If the sequence names contain colons (:) '
                                                                     'or semicolons (;), they will be replaced '
-                                                                    'in under-lines')
+                                                                    'with dashes (-)')
     parser_mut.add_argument('-cf', '--clone_field', help='The clone field. default - as in ChangeO / AIRR format')
     parser_mut.add_argument('-sf', '--seq_field', help=f'The sequence field. default - as in ChangeO / AIRR format')
     parser_mut.add_argument('-gf', '--gl_field', help=f'The germline field. default - as in ChangeO / AIRR format')

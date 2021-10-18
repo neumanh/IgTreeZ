@@ -393,9 +393,9 @@ class Mutation:
             arr.append('polar_target')
         else:
             arr.append('non_polar_target')
-
         # For both
-        if (self.aa1.polarity and self.aa2.polarity) and (self.aa1.aa != self.aa2.aa):  # A replacement mutation
+        if (self.aa1.polarity is not None) and (self.aa2.polarity is not None) \
+                and (self.aa1.aa != self.aa2.aa):  # A replacement mutation
             if self.aa1.polarity == self.aa2.polarity:
                 arr.append('polarity_keep')
             else:

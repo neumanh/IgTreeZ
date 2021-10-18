@@ -3,12 +3,17 @@ library(alakazam)
 library(stringr)
 library(dplyr)
 
+# Getting the source script path (from https://stackoverflow.com/a/1815743)
+initial_options <- commandArgs(trailingOnly = FALSE)
+file_arg_name <- "--file="
+script_name <- sub(file_arg_name, "", initial_options[grep(file_arg_name, initial_options)])
+script_basename <- dirname(script_name)
+source_name <- paste0(script_basename, "/functions.R")
 # Including some functions
-source("/home/ls/hadasn/new_pipeline/wrk_env/80-Elul-poptree/unite_program/treez/1_3/rscripts/functions.R")
+source(source_name)
 
 # Defining file names
 args <- commandArgs(TRUE)
-#args <- 'C:\\Users\\user\\Documents\\biolab\\selection\\pat3_ex_1000.tab'
 
 if (length(args) < 2) {
   stop("No input. Should be: selection.r <IgTreez_output1> <IgTreez_output2> ...", call. = FALSE)
@@ -37,7 +42,7 @@ df$mu_count_fwr_s <- as.numeric(df$mu_count_fwr_s)
 # Creaing the output prefix
 plot_prefix <- paste0(unique(as.character(df$sample)), collapse = "_")
 if (nchar(plot_prefix) > 50){
-  plot_prefix <- paste0(substr(plot_prefix, 1, 40),sample(1:900, 1))
+  plot_prefix <- paste0(substr(plot_prefix, 1, 40),"_", sample(1:900, 1))
   cat('***Output saved as ',plot_prefix, '\n')
   
 }
