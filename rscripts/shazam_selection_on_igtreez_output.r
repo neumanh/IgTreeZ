@@ -8,7 +8,7 @@ initial_options <- commandArgs(trailingOnly = FALSE)
 file_arg_name <- "--file="
 script_name <- sub(file_arg_name, "", initial_options[grep(file_arg_name, initial_options)])
 script_basename <- dirname(script_name)
-source_name <- paste0(script_basename, "/functions.R")
+source_name <- paste0(script_basename, "/functions.r")
 # Including some functions
 source(source_name)
 
