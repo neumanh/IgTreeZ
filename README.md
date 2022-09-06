@@ -18,11 +18,11 @@ To use the 'draw' sub-program, you will need [Graphviz](https://graphviz.org/dow
    ```sh
    git clone https://github.com/neumanh/IgTreeZ.git
    ```
-2. Download [IgTreeZ_1.7.1.tar.gz](./IgTreeZ_1.7.1.tar.gz). To extract the file in the local directory, use
+2. Download [IgTreeZ_1.8.2.tar.gz](./IgTreeZ_1.8.2.tar.gz). To extract the file in the local directory, use
    ```sh
    tar -zxvf IgTreeZ*.tar.gz
    ```
-3. Download [IgTreeZ_1.7.1.zip](./IgTreeZ_1.7.1.zip). To extract the file in the local directory, use
+3. Download [IgTreeZ_1.8.2.zip](./IgTreeZ_1.8.2.zip). To extract the file in the local directory, use
    ```sh
    unzip IgTreeZ*.zip
    ```
