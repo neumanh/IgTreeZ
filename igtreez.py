@@ -129,8 +129,7 @@ def get_arg_parser():
     parser_mut.add_argument('-if', '--id_field', help=f'The sequence ID field. default - '
                                                       f'for ChangeO format: SEQUENCE_ID . For '
                                                       f'AIRR format: sequence_id')
-    parser_mut.add_argument('-gl', '--gl_name', help=f'The germline name. To be used with the \'--fasta\' argument. '
-                                                     f'default - GL', default='GL')
+    parser_mut.add_argument('-gl', '--gl_name', help=f'The germline name in trees. default - GL', default='GL')
     parser_mut.set_defaults(function=call_mutations)
 
     # The mtree analysis
