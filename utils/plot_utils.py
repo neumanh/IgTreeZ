@@ -13,26 +13,78 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import rcParams
+import pandas as pd
 
 matplotlib.use('Agg')
 
 rcParams.update({'figure.autolayout': True})  # Adjusting the x labels o the figure
 
 
-def box_plot(dicti: dict, fig_name: str = 'figure.pdf', xlab: str = 'Transitions', ylab: str = 'Distance (mutations)'):
+def grouped_box_plot(df: pd.DataFrame, x: str, y: str, hue: str, fig_name: str = 'grouped_box_plot.pdf'):
+    """
+    Plots grouped box plot using seaborn
+    :param df: The dataframe to plot
+    :param x: The boxes' groups
+    :param y: The values to measure
+    :param hue: The sub-boxes
+    :param fig_name: The output figure name
+    :return: None
+    """
+    import seaborn as sns  # Used only here
+
+    # create grouped boxplot
+    labels = df[hue].unique()
+    colors = create_color_dict(labels)
+    flierprops = dict(marker='o', markerfacecolor='w', markersize=3)
+
+    base_font_size = 10
+    num_groups = len(df[x].unique())
+    sns.set(rc={'figure.figsize': (5, 5)})
+    if num_groups > 1:
+        sns.set(rc={'figure.figsize': (6, 5)})
+    if num_groups > 2:
+        sns.set(rc={'figure.figsize': (8, 5)})  # To create wider image
+        if num_groups > 6:
+            sns.set(rc={'figure.figsize': (10, 5)})
+    sns.set_style("white")
+
+    df[x] = df[x].str.replace('_', '\n')
+    df[x] = df[x].str.capitalize()
+
+    ax = sns.boxplot(x=x, y=y, hue=hue, data=df, palette=colors, linewidth=1, flierprops=flierprops, width=0.5)
+    if num_groups > 1:
+        ax.set_yscale("log")
+    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=base_font_size)
+    plt.xlabel('')
+    plt.ylabel('')
+    fig = ax.get_figure()
+    fig.savefig(fig_name)
+
+    plt.close()
+
+
+def box_plot(dicti: dict, fig_name: str = 'box_plot.pdf', xlab: str = 'Transitions', ylab: str = 'Distance (mutations)',
+             font=None):
     """
     Plots the box plot
     :param fig_name: The output figure name
     :param dicti: The transition / population dictionary
     :param xlab: The x lable of the created graph
     :param ylab: The y lable of the created graph
+    :param font: Font size
     :return: None
     """
 
     # Collect the data
     all_data, labels = dict_to_lists(dicti)
-    # print(all_data)
-    # print(labels)
+
+    # Enlarging the fonts
+    if font:
+        font = int(font)
+        matplotlib.rc('font', size=font)
+        matplotlib.rc('ytick', labelsize=(font - 2))
+
+    new_labels = [a.replace('_', '\n') for a in labels]
 
     if len(labels) > 1:
         fig, ax = plt.subplots()
@@ -42,7 +94,7 @@ def box_plot(dicti: dict, fig_name: str = 'figure.pdf', xlab: str = 'Transitions
         bplot = ax.boxplot(all_data,
                            vert=True,  # vertical box alignment
                            patch_artist=True,  # fill with color
-                           labels=labels,  # will be used to label x-ticks
+                           labels=new_labels,  # will be used to label x-ticks
                            medianprops=medianprops)
 
         # fill with colors
@@ -51,20 +103,19 @@ def box_plot(dicti: dict, fig_name: str = 'figure.pdf', xlab: str = 'Transitions
             patch.set_facecolor(color)
 
         # Adjusting the plot for large number of populations
-        if len(labels) > 20:
-            plt.setp(ax.get_xticklabels(), rotation=90)  # Rotate in 30 degrees
-            plt.gcf().subplots_adjust(bottom=0.3)  # Add the bottom space
-        elif len(labels) > 15:
-            plt.setp(ax.get_xticklabels(), rotation=45,
-                     horizontalalignment='right')  # Rotate in 90 degrees (vertically)
-            plt.gcf().subplots_adjust(bottom=0.3)  # Add the bottom space
-        elif len(labels) > 3:
-            plt.setp(ax.get_xticklabels(), rotation=30,
-                     horizontalalignment='right')  # Rotate in 90 degrees (vertically)
-            plt.gcf().subplots_adjust(bottom=0.15)  # Add the bottom space
+        # if len(labels) > 20:
+        #     plt.setp(ax.get_xticklabels(), rotation=90)  # Rotate in 30 degrees
+        #     plt.gcf().subplots_adjust(bottom=0.3)  # Add the bottom space
+        # elif (len(labels) > 15) or (font >= 14):
+        #     plt.setp(ax.get_xticklabels(), rotation=45,
+        #              horizontalalignment='right')  # Rotate in 90 degrees (vertically)
+        #     plt.gcf().subplots_adjust(bottom=0.3)  # Add the bottom space
+        # elif len(labels) > 3:
+        #     plt.setp(ax.get_xticklabels(), rotation=30,
+        #              horizontalalignment='right')  # Rotate in 90 degrees (vertically)
+        #     plt.gcf().subplots_adjust(bottom=0.15)  # Add the bottom space
 
-        ax.set_xlabel(xlab)
-        ax.set_ylabel(ylab)
+        ax.set_ylabel(ylab.capitalize().replace('_', ' '))
 
         # Adjusting the limits
         plt.gcf().subplots_adjust(left=0.15)

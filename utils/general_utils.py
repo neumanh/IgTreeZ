@@ -26,7 +26,11 @@ parent_dir_name = 'IgTreeZ_output'
 # defined by IMGT http://www.imgt.org/IMGTScientificChart/Nomenclature/IMGT-FRCDRdefinition.html
 imgt_regions = {'fwr1': 0, 'cdr1': 78, 'fwr2': 114, 'cdr2': 165, 'fwr3': 195, 'cdr3': 313, 'cdr3_end': 312}
 
+gl_names = ['G.L.', 'G.L', 'GL', 'Germline', 'germline', 'Germ', 'naive', 'germ', 'Germline_UCA', 'GERMLINE']
+
 curr_log_object = None
+
+debug_mode = 0
 
 
 def get_node_names(t: Tree):

@@ -13,6 +13,7 @@ import re
 # Imports
 from ete3 import Tree
 from objects.node import Node
+from utils import general_utils
 
 
 def sort_pops(pop_dict: dict, input_pops: list):
@@ -214,3 +215,15 @@ def multiple_pops_in_name(name: str, pops: list):
             elif first_pop and (not second_pop):
                 second_pop = True
     return second_pop
+
+
+def add_sample_column(df, sample_name: str):
+    """
+    Insert a sample column in the beggining of the dataframe
+    :param df: Results dataframe
+    :param sample_name: The analysis name
+    :return: The updated dataframe
+    """
+    # Inserting the sample column in the beginning of the dataframe
+    df.insert(loc=0, column=general_utils.sample_str, value=sample_name)
+    return df

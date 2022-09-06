@@ -10,6 +10,7 @@ class Treat:
         self.nodes = 0
         self.leaves = 0
         self.od_avg = 0
+        self.sod_avg = 0
         self.rootd = 0
         self.drsn_min = 0
         self.dasn_min = 0
@@ -19,7 +20,7 @@ class Treat:
 
 
     def __dir__(self):
-        return ['id', 'nodes', 'leaves', 'od_avg', 'rootd', 'drsn_min', 'dasn_min', 'trunk', 'dlfsn_avg', 'pl_min']
+        return ['id', 'nodes', 'leaves', 'od_avg', 'sod_avg', 'rootd', 'drsn_min', 'dasn_min', 'trunk', 'dlfsn_avg', 'pl_min']
 
     def __str__(self):
         string = 'Tree attributes:'

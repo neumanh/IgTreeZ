@@ -1,5 +1,7 @@
 #!/usr/bin/python3
+import os
 
+import pandas as pd
 from objects import AminoAcid, Charge, Hydropathy, HydroDonor, Chemical, Volume
 
 
@@ -7,6 +9,7 @@ class Mutation:
     """
     Holds data on a mutation
     """
+
     def __init__(self, codon1: str, codon2: str, pos: int, regions: dict, no_cdr3: bool = False):
         self.codon1, self.codon2 = codon1, codon2
         self.aa1, self.aa2 = self.define_mut_by_codon(codon1, codon2)
@@ -15,15 +18,12 @@ class Mutation:
         self.no_cdr3 = no_cdr3
 
     def __dir__(self):
-        return ['pos', 'codon1', 'codon2', 'aa1', 'aa2', 'regions', 'no_cdr3']
+        return ['pos', 'codon1', 'codon2', 'aa1', 'aa2', 'regions', 'no_cdr3', 'distance']
 
     def __str__(self):
-        # string = 'Mutation type:'
-        # for att in self.__dir__():
-        #     if getattr(self, att):
-        #         string += f' {att}'
-        string = f'Mutation: pos: {self.pos}   codon1: {self.codon1}   codon2: {self.codon2}   aa1: {self.aa1}   ' \
-                 f'aa2: {self.aa2}  regions: {self.regions}  no_cdr3: {self.no_cdr3}'
+        string = f'Mutation: pos: {self.pos}\tcodon1: {self.codon1}\tcodon2: {self.codon2}\taa1: {self.aa1}' \
+                 f'\taa2: {self.aa2}\tregions: {self.regions}\tno_cdr3: {self.no_cdr3}' \
+                 f'\tdistance: {self.define_distance()}'
         return string
 
     def __repr__(self):
@@ -229,7 +229,7 @@ class Mutation:
         Defines the 7 hydropathy definitions: positive/negative/neutral for source and traget, charge change/keep
         :return: A dictionary with the definitions
         """
-        arr = []        # for aa1:
+        arr = []  # for aa1:
         if self.aa1.hydro == Hydropathy.HYDROPHOBIC:
             arr.append('hydrophobic_source')
         elif self.aa1.hydro == Hydropathy.HYDROPHILIC:
@@ -259,7 +259,7 @@ class Mutation:
         Defines the volume definitions.
         :return: A dictionary with the definitions
         """
-        arr = []        # for aa1:
+        arr = []  # for aa1:
         if self.aa1.volume == Volume.VERY_SMALL:
             arr.append('vs_volume_source')
         elif self.aa1.volume == Volume.SMALL:
@@ -302,7 +302,7 @@ class Mutation:
         Defines the chemical definitions.
         :return: A dictionary with the definitions
         """
-        arr = []        # for aa1:
+        arr = []  # for aa1:
         if self.aa1.chemical == Chemical.AMIDE:
             arr.append('amide_source')
         elif self.aa1.chemical == Chemical.ACIDIC:
@@ -402,3 +402,25 @@ class Mutation:
                 arr.append('polarity_change')
 
         return arr
+
+    def define_distance(self):
+        """
+        Defines the distance between the amino acids
+        :return: The distance as integer based on Sneath 1966
+        """
+        if self.aa1 and self.aa2:
+            dist = 0
+            if self.aa1.aa != self.aa2.aa:  # A replacement mutation
+                # Importing the distance matrix and
+                aa_index_file = f'{os.path.dirname(__file__)}/../utils/aa_distance_indexes/sneath_index.csv'
+                dist_matrix = pd.read_csv(aa_index_file, index_col=0).fillna(0)
+                dist_dict = dist_matrix.to_dict()
+                aa1 = self.aa1.aa
+                aa2 = self.aa2.aa
+                if (aa1 in dist_dict) and (aa2 in dist_dict[aa1]):
+                    dist += dist_dict[aa1][aa2]
+                if (aa2 in dist_dict) and (aa1 in dist_dict[aa2]):
+                    dist += dist_dict[aa2][aa1]
+        else:
+            dist = -1
+        return dist

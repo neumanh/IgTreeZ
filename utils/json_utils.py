@@ -140,8 +140,8 @@ def collect_trees_and_seqs_from_scheme(args, log_object: Logger):
     if not log_object:
         log_object = general_utils.create_general_log_object()
 
-    if args.illumina:
-        log_object.warning('The parameter \'-illumina\' is ignored for AIRR scheme analysis')
+    if args.illumina or args.igtree:
+        log_object.warning('The arguments \'--illumina\' and \'--igtree\' are ignored for AIRR scheme analysis')
 
     with open(json_file) as f:
         json_object = json.load(f)

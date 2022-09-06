@@ -9,8 +9,8 @@ __author__ = 'Hadas Neuman'
 __version__ = '1.0'
 __date__ = '13/10/20'
 
-import pandas as pd
 # Imports
+import pandas as pd
 from utils import general_utils
 
 

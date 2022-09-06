@@ -46,7 +46,7 @@ def plot(trans_dict: dict, norm_dict_by_source: dict, norm_dict_by_dest: dict, p
         log_object = general_utils.create_general_log_object()
 
     if pop_dict:
-        plot_utils.box_plot(pop_dict, fig_name=f'{outdir}/{name}_population_levels.pdf')
+        plot_utils.box_plot(pop_dict, fig_name=f'{outdir}/{name}_population_levels.pdf', xlab='Populations')
         plot_utils.bar_plot(pop_dict, fig_name=f'{outdir}/{name}_population_count.pdf')
         plot_utils.basic_pie_plot(pop_dict, fig_name=f'{outdir}/{name}_populations_pie.pdf')
     else:
@@ -77,8 +77,8 @@ def plot(trans_dict: dict, norm_dict_by_source: dict, norm_dict_by_dest: dict, p
         plot_utils.plot_hist(pop_count, fig_name=f'{outdir}/{name}_population_count_frequency.pdf')
 
 
-def save_ouput_tables(trans_dict: dict, norm_dict_by_source: dict, norm_dict_by_dest: dict, pop_dict: dict, trans_df,
-                      pop_df, name: str, out_dir: str):
+def save_output_tables(trans_dict: dict, norm_dict_by_source: dict, norm_dict_by_dest: dict, pop_dict: dict, trans_df,
+                       pop_df, name: str, out_dir: str):
     """
     Saves the output tables
     :param trans_dict: The transitions dictionary
@@ -101,20 +101,24 @@ def save_ouput_tables(trans_dict: dict, norm_dict_by_source: dict, norm_dict_by_
     transitions_stats_name = f'{out_dir}/{name}_transitions_distance_summary.csv'
     transitions_nor_source_stats_name = f'{out_dir}/{name}_transitions_summary_normalized_by_source.csv'
     transitions_nor_dest_stats_name = f'{out_dir}/{name}_transitions_summary_normalized_by_destination.csv'
-    populations_stats_name = f'{out_dir}/{name}_populations_levle_summary.csv'
+    populations_stats_name = f'{out_dir}/{name}_populations_level_summary.csv'
 
     # Saving the outputs
     if len(trans_dict) > 0:
-        save_to_file(trans_dict, transitions_csv_name, transitions_stats_name)
+        save_to_file(trans_dict, transitions_csv_name, transitions_stats_name, name)
     if len(norm_dict_by_source) > 0:
-        save_to_file(norm_dict_by_source, transitions_norm_by_source_csv_name, transitions_nor_source_stats_name)
+        save_to_file(norm_dict_by_source, transitions_norm_by_source_csv_name, transitions_nor_source_stats_name, name)
     if len(norm_dict_by_dest) > 0:
-        save_to_file(norm_dict_by_dest, transitions_norm_by_dest_csv_name, transitions_nor_dest_stats_name)
+        save_to_file(norm_dict_by_dest, transitions_norm_by_dest_csv_name, transitions_nor_dest_stats_name, name)
     if len(pop_dict) > 0:
-        save_to_file(pop_dict, populations_csv_name, populations_stats_name)
+        save_to_file(pop_dict, populations_csv_name, populations_stats_name, name)
     if trans_df.any:
+        # Insert a sample name in the beginning of the name
+        trans_df = poptree_utils.add_sample_column(trans_df, name)
         trans_df.to_csv(transitions_by_tree_name, index=False)
     if pop_df.any:
+        # Insert a sample name in the beginning of the name
+        pop_df = poptree_utils.add_sample_column(pop_df, name)
         pop_df.to_csv(populations_by_tree_name, index=False)
 
 
@@ -124,7 +128,6 @@ def poptree(args):
     :param args: The input arguments
     :return:
     """
-
     log_object = Logger(args.name, args.silent, 'poptree')
 
     # Getting the input arguments
@@ -173,8 +176,8 @@ def poptree(args):
     norm_dict_by_dest = edit_transitions_dict(norm_dict_by_dest)
 
     # Saving the analysis results to files
-    save_ouput_tables(trans_dict, norm_dict_by_source, norm_dict_by_dest, pop_dict, trans_df, pop_df, args.name,
-                      output_dir)
+    save_output_tables(trans_dict, norm_dict_by_source, norm_dict_by_dest, pop_dict, trans_df, pop_df, args.name,
+                       output_dir)
 
     log_object.info(f'The output files were saved in: {output_dir}')
     log_object.done()
@@ -289,16 +292,20 @@ def edit_transitions_dict(trans_dict: dict):
     return edited_dict
 
 
-def save_to_file(data_dict: dict, table_file_name: str, stat_file_name: str):
+def save_to_file(data_dict: dict, table_file_name: str, stat_file_name: str, sample_name: str):
     """
     Saves poptree's results
     :param data_dict: The transition or population dictionary
     :param table_file_name: The output data file name
     :param stat_file_name: The output summary file name
+    :param sample_name: The analysis name
     :return: None
     """
     df = pd.DataFrame.from_dict(data_dict, orient='index')
     df = df.transpose()
+
+    # Insert a sample name in the beginning of the dataframe
+    df = poptree_utils.add_sample_column(df, sample_name)
 
     # Saving to CSV
     df.to_csv(table_file_name, index=False, index_label=False)

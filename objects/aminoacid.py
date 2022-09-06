@@ -26,7 +26,7 @@ class AminoAcid:
         #     if getattr(self, att):
         #         string += f' {att}'
         string = f'AA: {self.aa}   charge: {self.charge}   hydro: {self.hydro}   volume: {self.volume}   ' \
-                 f'chemical: {self.chemical} hydro_da: {self.hydro_da} polarity: {self.polarity} '
+                 f'chemical: {self.chemical} hydro_da: {self.hydro_da} polarity: {self.polarity}'
         return string
 
     def __repr__(self):
@@ -171,8 +171,9 @@ class AminoAcid:
         :return:
         """
         # By IMGT's definition: http://www.imgt.org/IMGTeducation/Aide-memoire/_UK/aminoacids/IMGTclasses.html
+        # nonpolar_aa = ['A', 'C', 'G', 'I', 'L', 'M', 'F', 'P', 'W', 'V']
+
         polar_aa = ['R', 'N', 'D', 'Q', 'E', 'H', 'K', 'S', 'T', 'Y']
-        #nonpolar_aa = ['A', 'C', 'G', 'I', 'L', 'M', 'F', 'P', 'W', 'V']
 
         polarity = None
         if self.aa and (self.aa != '_'):  # Not a None or a stop codon

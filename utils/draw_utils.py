@@ -126,9 +126,9 @@ def color_trees(file: str, color_dict: dict, out_dir: str = "."):
                     for pop in color_dict:
                         color = color_dict[pop]
                         node_label = find_label_in_node(line)
-                        if node_label != -1:  # The is a label
-                            # If the label was found to be '' or contains I/inferred- a hypothetical node
-                            if (node_label == '') or ('nferred' in node_label) or re.match(r'^\d{1,3}$', node_label):
+                        if node_label != -1:  # This is a label
+                            # If the label was found to be '' or include I/inferred or just a number-a hypothetical node
+                            if (node_label == '') or ('nferred' in node_label) or re.match(r'^\d{1,5}$', node_label):
                                 if 'fillcolor=white' not in line_to_write:  # The color was not added previously
                                     line_to_write = line_to_write.replace(']', f', fillcolor=white]')
                             elif pop in node_label:
@@ -148,6 +148,55 @@ def color_trees(file: str, color_dict: dict, out_dir: str = "."):
 
 
 def create_legend(color_dict: dict, legend_file_name: str = "legend.dot", directory: str = "."):
+    """
+    Creates a legend based on populations and colors
+    :param color_dict: The population-color dictionary
+    :param directory: The output directory
+    :param legend_file_name: The chosen output legend name
+    :return: legend_file_name
+    """
+    legend_file_name = f'{directory}/{legend_file_name}'
+    header_str1 = 'digraph G {\n\nsubgraph cluster_0 {\ncolor=white;\nnode [style=filled,color=white];\nlabel = ""'
+    first_pop = ''
+    # Creating the name list
+    arrow_str1 = ''
+    for pop0 in color_dict:
+        pop = re.sub(r'^_', '', pop0)  # Removing the _ in the beginning
+        if not arrow_str1:  # The first iteration
+            arrow_str1 = pop
+            first_pop = pop
+        else:
+            arrow_str1 = f'{arrow_str1} -> "{pop}"'
+    arrow_str1 = f'{arrow_str1} -> "Hypothetical\\nsplit node" [style="invis"]' + '}'
+
+    # Creating the colored circles
+    header_str2 = 'subgraph cluster_1 {\n\tnode [style=filled, label=""];\n\tlabel = " ";\n\tcolor=white\n'
+    arrow_str2 = ''
+    node_str2 = ''
+    i = 1
+    for pop0 in color_dict:
+        node_str2 = f'{node_str2}{i} [fillcolor="{color_dict[pop0]}"];\n'
+        if not arrow_str2:  # The first iteration
+            arrow_str2 = f'{i}'
+        else:
+            arrow_str2 = f'{arrow_str2} -> {i}'
+        i += 1
+    node_str2 = f'{node_str2}{i} [fillcolor="white"];\n'
+    arrow_str2 = f'{arrow_str2} -> {i} [style="invis"];' + '}'
+
+    footer = f'Legend -> "{first_pop}" [style="invis"];\nLegend -> 1 [style="invis"] ;\n' \
+             f'Legend [style=filled,color=white, label=""];' + '}\n'
+
+    legend_str = header_str1 + arrow_str1 + header_str2 + node_str2 + arrow_str2 + footer
+
+    with open(legend_file_name, "w") as fout:
+        # Writing the header and the hypothetical node
+        fout.write(legend_str)
+
+    return legend_file_name
+
+
+def create_legend0(color_dict: dict, legend_file_name: str = "legend.dot", directory: str = "."):
     """
     Creates a legend base on populations and colors
     :param color_dict: The population-color dictionary

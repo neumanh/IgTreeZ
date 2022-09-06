@@ -55,17 +55,18 @@ def attach_gl_seqs(t: Tree, sequences_file: str, gl):
     return t
 
 
-def process_sequences_names(sequence_file: str):
+def process_sequences_names(sequence_file: str, colon_rep: str):
     """
     Processes the nodes names, for IgTree input files
     :param sequence_file: The sequences file
+    :param colon_rep: If not None, replace all ":" and ";" in the sequence names with this string
     :return: The output file names
     """
     out_file = os.path.basename(sequence_file) + "_names-updated.fasta"
     updt_records = []
     for record in SeqIO.parse(sequence_file, "fasta"):
-        updated_record_name = record.id.replace(":", "-")
-        updated_record_name = updated_record_name.replace(";", "-")
+        updated_record_name = record.id.replace(':', colon_rep)
+        updated_record_name = updated_record_name.replace(';', colon_rep)
         record.id = updated_record_name
         new_record = SeqRecord(record.seq, updated_record_name, '', '')
         updt_records.append(new_record)
@@ -101,14 +102,14 @@ def get_seq_from_dict(node_name: str, seq_dict: dict):
     return seq
 
 
-def link_alignment_to_tree(fasta_file: str, t: Tree, gl_name: str, log_object: Logger = None, illumina: str = False):
+def link_alignment_to_tree(fasta_file: str, t: Tree, gl_name: str, log_object: Logger = None, colon_rep: str = False):
     """
     Links sequences to tree
     :param fasta_file: the IgTree input txt file
     :param t: An ETE3 Tree object
     :param gl_name: the GL name
     :param log_object: The Logger object
-    :param illumina: Whether to replace colons with under-line
+    :param colon_rep: If not None, replace all ":" and ";" in the sequence names with this string
     :return: a tree that contains the aligned sequences
     """
 
@@ -118,9 +119,9 @@ def link_alignment_to_tree(fasta_file: str, t: Tree, gl_name: str, log_object: L
     # Saving the tree id
     tree_id = t.id
 
-    if illumina:
+    if colon_rep:
         # Processing the fasta file
-        temp_file = process_sequences_names(fasta_file)
+        temp_file = process_sequences_names(fasta_file, colon_rep)
     else:
         temp_file = fasta_file
 
@@ -151,7 +152,6 @@ def link_alignment_to_tree(fasta_file: str, t: Tree, gl_name: str, log_object: L
 
         # For backing up the linking
         seq_dict = get_seqs_dict(temp_file)
-        print(seq_dict)  # TEMP
 
         if hasattr(t, 'sequence'):
             seq_num = 0  # The sequences counter
@@ -192,10 +192,11 @@ def link_alignment_to_tree(fasta_file: str, t: Tree, gl_name: str, log_object: L
     return t
 
 
-def attach_trees_using_fasta(args, log_object: Logger = None):
+def attach_trees_using_fasta(args, colon_rep:str, log_object: Logger = None):
     """
     Attahces sequences to trees.
     :param args: The input arguments.
+    :param colon_rep: If not None, replace all ":" and ";" in this string
     :param log_object: The Logger object
     :return: A list of ETE trees
     """
@@ -222,6 +223,6 @@ def attach_trees_using_fasta(args, log_object: Logger = None):
             # Linking the trees with tha fasta files in prallel
             linked_trees = pool.starmap(link_alignment_to_tree,
                                         zip(seq_list, tree_list, repeat(args.gl_name), repeat(log_object),
-                                            repeat(args.illumina)))
+                                            repeat(colon_rep)))
 
     return linked_trees

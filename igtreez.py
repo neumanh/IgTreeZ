@@ -6,8 +6,8 @@ Plots Ig statistics
 # Info
 __author__ = 'Hadas Neuman'
 __mail__ = 'hadas.doron@gmail.com'
-__version__ = '1.7.1'
-__date__ = '3/8/21'
+__version__ = '1.7.6'
+__date__ = '8/3/22'
 
 import multiprocessing as mp
 from argparse import ArgumentParser
@@ -27,9 +27,11 @@ def check_arguments(args):
         print('Error: FASTA and DATABASE: only one of the arguments can be used')
     elif (args.command == 'mutations') and args.json and args.database:
         print('Error: JSON and DATABASE: only one of the arguments can be used')
+    elif (args.command == 'mutations') and args.igtree and (not args.illumina):
+        print('Error: The \'--igtee\' argument must be used with the \'--illumina\' argument')
     elif (args.command != 'compare') and (not args.tree) and (not args.json):
         print('Error: Trees must given as Newick files or as part of an AIRR scheme json file')
-    elif (args.command == 'mutations') and not args.json and (not args.database) and (not args.fasta):
+    elif (args.command == 'mutations') and (not args.json) and (not args.database) and (not args.fasta):
         print('Error: Sequences must given as Fasta files or as ChangeO/AIRR database, or as AIRR scheme json file')
     elif (args.command == 'mutations') and (not args.database) and (args.clone_field or args.gl_field or args.seq_field
                                                                     or args.id_field):
@@ -70,7 +72,7 @@ def get_arg_parser():
     :return: The parser
     """
 
-    desc = "Plot analysis results"
+    desc = "Immunoglobulin lineage tree analyzer"
 
     # Define argument parser
     parents = get_parent()
@@ -81,7 +83,7 @@ def get_arg_parser():
 
     # The mutation count
     parser_mut = subparsers.add_parser('mutations', parents=[parents],
-                                       help='Plot the IgTreez mutation outputs.')
+                                       help='Runs a tree-based mutation analysis')
     parser_mut.add_argument('-f', '--fasta', action='store', nargs='+',
                             help='Fasta files for each clone\'s sequences and germinal sequence')
     parser_mut.add_argument('-d', '--database', action='store',
@@ -105,7 +107,16 @@ def get_arg_parser():
     parser_mut.add_argument('--plot', action='store_true', help='Creates plots')
     parser_mut.add_argument('--illumina', action='store_true', help='If the sequence names contain colons (:) '
                                                                     'or semicolons (;), they will be replaced '
-                                                                    'with dashes (-)')
+                                                                    'with a dash (-)')
+    parser_mut.add_argument('--igtree', action='store_true', help='If the sequence names contain colons (:) '
+                                                                  'or semicolons (;), they will be replaced '
+                                                                  'with  an underline (_) instead of a dash '
+                                                                  'To be used with the \'--illumina\' argument')
+    parser_mut.add_argument('--trunkless', action='store_true', help='If the trunk tree was removed, the does not '
+                                                                     'represents the germline sequences, '
+                                                                     'infer the root sequences same as the other '
+                                                                     'nodes. Only for database input'
+                                                                  'To be used with the \'--illumina\' argument')
     parser_mut.add_argument('-cf', '--clone_field', help='The clone field. default - as in ChangeO / AIRR format')
     parser_mut.add_argument('-sf', '--seq_field', help=f'The sequence field. default - as in ChangeO / AIRR format')
     parser_mut.add_argument('-gf', '--gl_field', help=f'The germline field. default - as in ChangeO / AIRR format')
@@ -131,11 +142,11 @@ def get_arg_parser():
     parse_poptree.set_defaults(function=call_poptree)
     # The filter analysis
     parse_filter = subparsers.add_parser('filter', parents=[parents],
-                                         help='Draws the trees using the dot command')
+                                         help='Filter trees according to population composition or tree size')
     parse_filter.add_argument('-AND', action='store', nargs='+', help='Collect trees with all the given populations.')
     parse_filter.add_argument('-OR', action='store', nargs='+', help='Collect trees with one of the given populations.')
     parse_filter.add_argument('-NOT', action='store', nargs='+',
-                              help='Collect trees without the given populations.')
+                              help='Collect trees that do not include the given populations.')
     parse_filter.add_argument('-nodes', action='store', nargs='+',
                               help='Collect trees with number of nodes in the size limits')
     parse_filter.add_argument('-leaves', action='store', nargs='+',

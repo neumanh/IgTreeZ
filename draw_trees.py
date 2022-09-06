@@ -52,12 +52,13 @@ def adjust_line_length(name: str, line_len: int = 30):
     return adj_name
 
 
-def new_to_dot(t, fontsize: int, line_width: int, output_file=None):
+def new_to_dot(t, no_color: bool, fontsize: int, line_width: int, output_file=None):
     """
     Converts the Newick to dot file
+    :param t: An ETE tree object
+    :param no_color: Whether the nodes shuld be colord later. If not - adjuct line length
     :param fontsize: The font size in the dot file
     :param line_width: The line width in the node name
-    :param t: An ETE tree object
     :param output_file: The output dot file name
     :return:
     """
@@ -70,18 +71,21 @@ def new_to_dot(t, fontsize: int, line_width: int, output_file=None):
         root = t
 
         for node in t.traverse():  # Traversing by level order (default)
-            if node == root:
+            if (node == root) and (not hasattr(node, 'name')):  # A nameless root
                 node.name = 'GL'
             else:
                 if not hasattr(node, 'name'):  # An inferred node
                     node.name = ''
-                elif 'Germline' in node.name:  # Non root germline
-                    continue  # TEMP
+                # elif 'Germline' in node.name:  # Non root germline
+                #    continue  # TEMP
 
             node.nid = str(counter)
 
             # Add node data
-            node_label = adjust_line_length(node.name, line_width)
+            if no_color:
+                node_label = adjust_line_length(node.name, line_width)
+            else:
+                node_label = node.name
 
             node_str = f'{node.nid} [style=filled,fontcolor=black, fontsize={fontsize}, label="{node_label}"];'
             dot_str = dot_str + '\n' + node_str
@@ -93,6 +97,8 @@ def new_to_dot(t, fontsize: int, line_width: int, output_file=None):
                     dist_label = f' [fontsize={int(int(fontsize) / 1.5)}, label="{dist}"]'
                 else:
                     dist_label = ''
+                if not hasattr(node.up, 'nid'):  # An un-named root
+                    node.up.nid = 'root'
                 edge_str = f'{node.up.nid} -> {node.nid}{dist_label};'
                 dot_str = dot_str + '\n' + edge_str
 
@@ -202,10 +208,16 @@ def draw_trees(args):
     args.ncors = int(args.ncors)
     number_of_workers = min(args.ncors, len(tree_list))
 
+    if not args.pops:
+        no_color = True
+    else:
+        no_color = False
+
     with mp.Pool(number_of_workers) as pool:
 
         # Converting all files to a dot format in parallel
-        dot_files = pool.starmap(new_to_dot, zip(tree_list, repeat(args.fontsize), repeat(args.linewidth)))
+        dot_files = pool.starmap(new_to_dot, zip(tree_list, repeat(no_color), repeat(args.fontsize),
+                                                 repeat(args.linewidth)))
         intermediate_files += dot_files
 
         # Get the color dictionary

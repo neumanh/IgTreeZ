@@ -39,7 +39,7 @@ df$mu_count_fwr_r <- as.numeric(df$mu_count_fwr_r)
 df$mu_count_fwr_s <- as.numeric(df$mu_count_fwr_s)
 
 
-# Creaing the output prefix
+# Creating the output prefix
 plot_prefix <- paste0(unique(as.character(df$sample)), collapse = "_")
 if (nchar(plot_prefix) > 50){
   plot_prefix <- paste0(substr(plot_prefix, 1, 40),"_", sample(1:900, 1))
@@ -78,6 +78,9 @@ if ('cdr3_end' %in% names(df)){
 }
 
 
+# Choosing text size
+num_samples <- length(unique(sample_names))
+cat('******NUM SAMPLES ', num_samples, '\n\n')
 
 # Calculate selection scores
 baseline <- calcBaseline(expected, testStatistic = "focused",
@@ -88,24 +91,62 @@ baseline <- calcBaseline(expected, testStatistic = "focused",
 # Combine selection scores by time-point
 grouped <- groupBaseline(baseline, groupBy="sample")
 
+# Replacing "_" in space
+sample_order = sapply(sample_names, levels)
+sample_order_spaces = gsub('_', ' ', sample_order)
+grouped@db$sample <- factor(gsub('_', ' ', grouped@db$sample), levels = sample_order_spaces)
+
+# Plot selection PDFs for a subset of the data
+p <- plotBaselineDensity(grouped, "sample", sigmaLimits=c(-1, 1), silent = T) + 
+  theme(text = element_text(size=12), legend.text = element_text(size = 12), 
+        legend.title = element_blank(), legend.key.size = unit(0.9, "cm"), 
+        legend.title.align = 0.25) +
+  xlab("Selection score")
+
+ggsave(p_den_name, p, width=9)
 
 
 # Plot mean and confidence interval by time-point
-p <- plotBaselineSummary(grouped, "sample") + theme(text = element_text(size=20), axis.text.x = element_text(size = 12))
+
+# Replacing the stat-sample names with " " and wrapping
+grouped@stats$sample <- gsub('_', ' ', grouped@stats$sample)
+grouped@stats$sample <- str_wrap(grouped@stats$sample, width = 10)
+
+
+p <- plotBaselineSummary(grouped@stats, "sample", size = 1.15, silent = T) + 
+  ylab("Selection score")
+if (num_samples < 10) {
+  p <- p + theme(text = element_text(size=12), 
+        axis.text.x = element_text(size = 12, color = "black",
+                                   angle = 0, hjust = 0.5))
+}
+
 ggsave(p_sum_name, p)
 
-# Plot selection PDFs for a subset of the data
-p <- plotBaselineDensity(grouped, "sample", sigmaLimits=c(-1, 1)) + theme(text = element_text(size=20), legend.text = element_text(size = 10))
-ggsave(p_den_name, p)
+##### Adding numbers to the sample names
+new_stats <- grouped@stats
+
+i = 1
+for (sn in unique(grouped@stats$sample)) {
+  
+  new_stats$sample <- gsub(paste0('\\b',sn,'\\b'), paste0(i, '_', sn), new_stats$sample) # The \b is used to replace the whole phrase
+  i = i+1
+}
+
+p_sum_name <- paste0(plot_prefix, '_selection_sum_ordered_with_cdr3.pdf', collapse = "_")
+p <- plotBaselineSummary(new_stats, "sample", size = 1.15, silent = T) + 
+  ylab("Selection score") +
+  theme(text = element_text(size=12), 
+        axis.text.x = element_text(size = 12, color = "black",
+                                   angle = 0, hjust = 0.5))
+ggsave(p_sum_name, p)
+############
+
 
 # Testing the difference in selection PDFs between groups
 con <- file(file_name)
 sink(con)
 testBaseline(grouped, groupBy="sample")
 write.csv(grouped@stats, csv_name)
-
-
-
-
 
 

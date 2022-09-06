@@ -3,8 +3,9 @@
 Tests statistic functions
 """
 import pandas as pd
-from objects import Logger
 from scipy import stats
+from objects import Logger
+import warnings
 
 alpha = 0.05
 
@@ -44,7 +45,7 @@ def is_paramteric(data_list: list):
     """
     out_str = ''
     parametric = False
-    if shapiro(data_list) > alpha:  # If pval > 0.05 => normally dist.
+    if shapiro(data_list) > alpha:  # If pval > 0.05 => normal dist.
         if levene(data_list) > alpha:  # If pval > 0.05 => homogenous variances
             parametric = True
             out_str += 'The data is normally distributed and has a homogeneity of variances'
@@ -87,6 +88,7 @@ def ttest(arg_list):
     """
     out_str = ''
     pval_dict = {}
+    pval_dict_dep = {}
     for idx1, arg1 in enumerate(arg_list):
         for idx2, arg2 in enumerate(arg_list):
             if idx1 < idx2:
@@ -94,13 +96,19 @@ def ttest(arg_list):
                 out_str += f'comparing {arg1.name} with {arg2.name} using T-test:\t {tt}\n'
                 dict_label = f'{arg1.name}_to_{arg2.name}'
                 pval_dict[dict_label] = tt[1]
-
-    return out_str, pval_dict
+                if len(arg1) == len(arg2):
+                    tp = stats.ttest_rel(arg1, arg2, nan_policy='omit')
+                    out_str += f'comparing {arg1.name} with {arg2.name} using paired T-test ' \
+                               f'for DEPENDANT data sets:\t {tp}\n'
+                    pval_dict_dep[dict_label] = tp[1]
+                else:
+                    pval_dict_dep[dict_label] = tt[1]
+    return out_str, pval_dict, pval_dict_dep
 
 
 def mwtest(arg_list):
     """
-    Performs T-test for each pair of data
+    Performs the Man-Whitney test for non-parametric pair of data
     :param arg_list: The lists to compare
     :return: A list of all T-test
     """
@@ -108,6 +116,7 @@ def mwtest(arg_list):
     # print(len(arg_list))
     out_str = ''
     pval_dict = {}
+    pval_dict_dep = {}
     for idx1, arg1 in enumerate(arg_list):
         for idx2, arg2 in enumerate(arg_list):
             if idx1 < idx2:
@@ -115,8 +124,15 @@ def mwtest(arg_list):
                 out_str += f'comparing {arg1.name} with {arg2.name} using Mann Whitney test:\t {mw}\n'
                 dict_label = f'{arg1.name}_to_{arg2.name}'
                 pval_dict[dict_label] = mw[1]
+                if len(arg1) == len(arg2):
+                    tp = stats.wilcoxon(arg1, arg2)
+                    out_str += f'comparing {arg1.name} with {arg2.name} using Wilcoxon test ' \
+                               f'for DEPENDANT data sets:\t {tp}\n'
+                    pval_dict_dep[dict_label] = tp[1]
+                else:
+                    pval_dict_dep[dict_label] = mw[1]
 
-    return out_str, pval_dict
+    return out_str, pval_dict, pval_dict_dep
 
 
 def all_identicle(data_list: list):
@@ -141,17 +157,11 @@ def analyze_df(df: pd.DataFrame, name: str, out_file: str = None, log_object: Lo
     :param df: A Dataframe
     :param name: The comparison field
     :param out_file: The output file
-    :param log_object: The Logger object, for documentation
+    :param log_object: The Logger object
     :return: The ANOVA/Kruskal Wallis p-value, the Mann-Whitney p-value dictionary, and the Benjamini-Hochberg dict.
     """
-    non_na_num = len(df.dropna())
-    if non_na_num > 5000:
-        non_na_num = 5000
-        log_object.warning('The significance analysis was performed on 5000 randomly selected trees.')
-
-    do_no_analyze_fields = ['nodes', 'leaves']
-    df = df.dropna()
-    data_list = [df[col].sample(n=non_na_num) for col in df]  # A list of series
+    do_no_analyze_fields = []
+    data_list = [df[col].dropna() for col in df]  # A list of series
     pval = None
     pval_dict = None
     fdr_dict = None
@@ -161,54 +171,63 @@ def analyze_df(df: pd.DataFrame, name: str, out_file: str = None, log_object: Lo
     if not out_file:
         out_file = f'{name}_stats.txt'
 
-    if name not in do_no_analyze_fields:
-        out_str = f'Analyzing {name}\n\n'
+    with warnings.catch_warnings(record=True) as w:
 
-        # Describe the data
-        desc = str(df.describe())
-        out_str += f'{desc}\n'
+        if name not in do_no_analyze_fields:
+            out_str = f'Analyzing {name}\n\n'
 
-        if not all_identicle(data_list):
-            parametric, param_str = is_paramteric(data_list)
-            out_str += param_str
+            # Describe the data
+            desc = str(df.describe())
+            out_str += f'{desc}\n'
 
-            if parametric:
-                # ANOVA
-                anova = stats.f_oneway(*data_list)
-                pval = anova[1]
+            if not all_identicle(data_list):
+                parametric, param_str = is_paramteric(data_list)
+                out_str += param_str
 
-                out_str += f'ANOVA results: {anova}\n'
+                if parametric:
+                    # ANOVA
+                    anova = stats.f_oneway(*data_list)
+                    pval = anova[1]
 
-                # Post Hoc
-                curr_str, pval_dict = ttest(data_list)
-                out_str += curr_str
+                    out_str += f'ANOVA results: {anova}\n'
 
-            else:
-                # Converting the series to lists
-                data_list_list = []
-                # print(data_list)
-                for d in data_list:
-                    data_list_list.append(d.to_list())
+                    # Post Hoc
+                    curr_str, pval_dict, pval_dep = ttest(data_list)
+                    out_str += curr_str
 
-                # Kruskal-Wallis H-test
-                kw = stats.mstats.kruskal(*data_list_list)
-                pval = kw[1]
+                else:  # Non parametric
+                    # Converting the series to lists
+                    data_list_list = []
+                    # print(data_list)
+                    for d in data_list:
+                        data_list_list.append(d.to_list())
 
-                out_str += f'Kruskal Wallis results: {kw}\n'
+                    # Kruskal-Wallis H-test
+                    kw = stats.mstats.kruskal(*data_list_list)
+                    pval = kw[1]
 
-                # Post Hoc
-                curr_str, pval_dict = mwtest(data_list)
-                out_str += curr_str
+                    out_str += f'Kruskal Wallis results: {kw}\n'
+
+                    # Post Hoc
+                    curr_str, pval_dict, pval_dep = mwtest(data_list)
+                    out_str += curr_str
                 curr_str, fdr_dict = benj_hoch(pval_dict)
                 out_str += curr_str
 
+                if pval_dep != pval_dict:
+                    curr_str1 = 'Including DEPENDANT result: '
+                    curr_str2, _ = benj_hoch(pval_dep)
+                    out_str += curr_str1
+                    out_str += curr_str2
+            else:  # all identical
+                out_str += 'All values are identical. Not analyzing significance.\n'
 
-        else:
-            out_str += 'All values are identicle. Not analyzing siginificance.\n'
+            out_str += '-------------------------------------------------------------\n\n'
 
-        out_str += '-------------------------------------------------------------\n\n'
+            with open(out_file, 'a') as f:
+                f.write(out_str)
 
-        with open(out_file, 'a') as f:
-            f.write(out_str)
+        for warning in w:
+            log_object.warning(f'While analyzing field {name}: {warning.message}')
 
     return pval, pval_dict, fdr_dict

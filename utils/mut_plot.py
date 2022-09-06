@@ -79,6 +79,7 @@ def plot_mut_array(mut_df: pd.DataFrame, name: str):
     names = ['Replacement Mutation', 'Silent Mutation']
     plot_three_plots(df_columns_to_dict(mut_df, cols, names), name + fig_title)
 
+    plot_conservation(mut_df, name)
     plot_hydro(mut_df, name)
     plot_charge(mut_df, name)
     plot_chemical(mut_df, name)
@@ -97,19 +98,21 @@ def plot_volume(mut_df: pd.DataFrame, name: str):
     """
     # Source charge
     fig_title = '_volume_source_'
-    cols = ['vs_volume_source', 'small_volume_source', 'medium_volume_source', 'large_volume_source', 'vl_volume_source']
+    cols = ['vs_volume_source', 'small_volume_source', 'medium_volume_source', 'large_volume_source',
+            'vl_volume_source']
     names = ['Very small source', 'Small source', 'Medium source', 'Large source', 'Very large source']
     plot_three_plots(df_columns_to_dict(mut_df, cols, names), name + fig_title)
 
     # Target charge
     fig_title = '_volume_target_'
-    cols = ['vs_volume_target', 'small_volume_target', 'medium_volume_target', 'large_volume_target', 'vl_volume_target']
+    cols = ['vs_volume_target', 'small_volume_target', 'medium_volume_target', 'large_volume_target',
+            'vl_volume_target']
     names = ['Very small target', 'Small target', 'Medium target', 'Large target', 'Very large target']
     plot_three_plots(df_columns_to_dict(mut_df, cols, names), name + fig_title)
 
     # Charge change
     fig_title = '_volume_change_'
-    cols = ['volume_decrease', 'volume_increase','volume_keep']
+    cols = ['volume_decrease', 'volume_increase', 'volume_keep']
     names = ['Decreased volume', 'Increased volume', 'Same volume']
     plot_three_plots(df_columns_to_dict(mut_df, cols, names), name + fig_title)
 
@@ -123,14 +126,18 @@ def plot_chemical(mut_df: pd.DataFrame, name: str):
     """
     # Source charge
     fig_title = '_chemical_source_'
-    cols = ['aliphatic_source', 'aromatic_source', 'sulfur_source', 'hydroxyl_source', 'basic_source' ,'acidic_source', 'amide_source']
-    names = ['Aliphatic source', 'Aromatic source', 'Sulfur_source', 'Hydroxyl source', 'Basic source' ,'Acidic source', 'Amide source']
+    cols = ['aliphatic_source', 'aromatic_source', 'sulfur_source', 'hydroxyl_source', 'basic_source', 'acidic_source',
+            'amide_source']
+    names = ['Aliphatic source', 'Aromatic source', 'Sulfur_source', 'Hydroxyl source', 'Basic source', 'Acidic source',
+             'Amide source']
     plot_three_plots(df_columns_to_dict(mut_df, cols, names), name + fig_title)
 
     # Target charge
     fig_title = '_chemical_target_'
-    cols = ['aliphatic_target', 'aromatic_target', 'sulfur_target', 'hydroxyl_target', 'basic_target' ,'acidic_target', 'amide_target']
-    names = ['Aliphatic target', 'Aromatic target', 'target', 'Hydroxyl target', 'Basic target' ,'Acidic target', 'Amide target']
+    cols = ['aliphatic_target', 'aromatic_target', 'sulfur_target', 'hydroxyl_target', 'basic_target', 'acidic_target',
+            'amide_target']
+    names = ['Aliphatic target', 'Aromatic target', 'target', 'Hydroxyl target', 'Basic target', 'Acidic target',
+             'Amide target']
     plot_three_plots(df_columns_to_dict(mut_df, cols, names), name + fig_title)
 
     # Charge change
@@ -178,13 +185,13 @@ def plot_hydro(mut_df: pd.DataFrame, name: str):
     # Hydrophobic/ hydrophilic source
     fig_title = '_hydro_source_'
     cols = ['hydrophobic_source', 'neutral_hydro_source', 'hydrophilic_source']
-    names = ['Hydrophobic source', 'Neutral hydropathy source','Hydrophilic source']
+    names = ['Hydrophobic source', 'Neutral hydropathy source', 'Hydrophilic source']
     plot_three_plots(df_columns_to_dict(mut_df, cols, names), name + fig_title)
 
     # Hydrophobic/ hydrophilic source
     fig_title = '_hydro_target_'
     cols = ['hydrophobic_target', 'neutral_hydro_target', 'hydrophilic_target']
-    names = ['Hydrophobic target', 'Neutral hydropathy target','Hydrophilic target']
+    names = ['Hydrophobic target', 'Neutral hydropathy target', 'Hydrophilic target']
     plot_three_plots(df_columns_to_dict(mut_df, cols, names), name + fig_title)
 
     # Hydrophobic/ hydrophilic change
@@ -251,6 +258,18 @@ def plot_region(mut_df: pd.DataFrame, name: str):
     names = ['FWR1 region', 'FWR2 region', 'FWR3 region', 'CDR1 region', 'CDR2 region', 'CDR3 region']
     plot_three_plots(df_columns_to_dict(mut_df, cols, names), name + fig_title)
 
+
+def plot_conservation(mut_df: pd.DataFrame, name: str):
+    """
+    Plots mutation statistics.
+    :param mut_df: The mutation dataframe
+    :param name: The analysis name
+    :return: None
+    """
+    # Source
+    # TODO
+
+
 def plot_polarity(mut_df: pd.DataFrame, name: str):
     """
     Plots mutation statistics.
@@ -270,7 +289,7 @@ def plot_polarity(mut_df: pd.DataFrame, name: str):
     names = ['Polar target', 'Non-polar target']
     plot_three_plots(df_columns_to_dict(mut_df, cols, names), name + fig_title)
 
-    # Hydrophobic/ hydrophilic change
+    # Polarity change
     fig_title = '_polarity_change_'
     cols = ['polarity_keep', 'polarity_change']
     names = ['Same polarity', 'Switched polarity']
@@ -288,4 +307,3 @@ def plot_three_plots(dic: dict, fig_title: str):
     plot_utils.bar_plot(dic, fig_name=fig_title + 'bar_plot.pdf', xlab='Mutation type', ylab='Overall mutations',
                         sum_flag=True)
     plot_utils.basic_pie_plot(dic, fig_name=fig_title + 'pie_plot.pdf', sum_flag=True)
-

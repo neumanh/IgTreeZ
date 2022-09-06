@@ -43,6 +43,10 @@ def order_mut_df_columns(df: pd.DataFrame, log_object: Logger, sample_name: str)
                           'mu_count_cdr_r', 'mu_count_cdr_s', 'mu_count_fwr_r', 'mu_count_fwr_s',
                           'cdr3_end', 'sequences']
 
+    # Adding the mutations_per_sequence column
+    if (mut_utils.all_mut_field in list(df)) and (mut_utils.seq_field in list(df)):
+        df[mut_utils.mut_per_seq_field] = round(df[mut_utils.all_mut_field] / df[mut_utils.seq_field], 2)
+
     df_columns = df.columns.tolist()
 
     # Collecting the df columns by the defined order
@@ -73,7 +77,17 @@ def count_obs_func(args):
     :return: None
     """
 
+    if general_utils.debug_mode:
+        print(args)
+    
     log_object = Logger(args.name, args.silent, 'mutations', args=args)
+
+    colon_rep = None
+    if args.illumina:
+        if args.igtree:
+            colon_rep = '_'
+        else:
+            colon_rep = '-'
 
     linked_trees = []
 
@@ -82,10 +96,10 @@ def count_obs_func(args):
         linked_trees = json_utils.collect_trees_and_seqs_from_scheme(args, log_object)
 
     if args.database:
-        linked_trees = db_utils.attach_seqs_by_df(args, log_object)
+        linked_trees = db_utils.attach_seqs_by_df(args, colon_rep, log_object)
 
     if args.fasta:
-        linked_trees = fasta_utils.attach_trees_using_fasta(args, log_object)
+        linked_trees = fasta_utils.attach_trees_using_fasta(args, colon_rep, log_object)
 
     if args.sample:
         linked_trees = general_utils.sample_tree_list(linked_trees, args.sample, log_object)

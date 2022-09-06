@@ -118,20 +118,24 @@ def attach_gl_to_tree(t: Tree, gl_seq: str):
             if hasattr(node, 'name') and (node.name in gls):
                 if gl_seq:
                     node.sequence = gl_seq
-                    # print('Attaching gl to the node', node.name) # DEBUG
+                    if general_utils.debug_mode:
+                        print('Attaching gl to the node', node.name) # DEBUG
 
     return t
 
 
-def link_alignment_to_tree_by_df(t: Tree, df: pd.DataFrame, log_object=current_log_object, illumina: bool=False):
+def link_alignment_to_tree_by_df(t: Tree, df: pd.DataFrame, log_object=current_log_object, colon_rep: str = None,
+                                 trunkless: bool = False):
     """
     Links sequences to tree
     :param df: The partial dataframe, containing only the relevant clone
     :param t: A ETE tree object
     :param log_object: The log object
-    :param illumina: Whether to replace colons with under-line
+    :param colon_rep: Whether to replace colons with under-line
+    :param trunkless: Whether the trunk was removed from tree
     :return: The updated tree, with the sequence attached
     """
+
     if not log_object:
         log_object = general_utils.create_general_log_object()
 
@@ -139,29 +143,33 @@ def link_alignment_to_tree_by_df(t: Tree, df: pd.DataFrame, log_object=current_l
         t = general_utils.replace_new_line_in_ig_tree(t)
         all_seq_assigned_flag = True
 
-        if illumina:
+        if colon_rep:
             # replacing the : and ; with _ in the column name - For illumina sequences
-            df[_id_field] = df[_id_field].str.replace(':', '-')
-            df[_id_field] = df[_id_field].str.replace(';', '-')
+            df[_id_field] = df[_id_field].str.replace(':', colon_rep)
+            df[_id_field] = df[_id_field].str.replace(';', colon_rep)
 
-        # print(t.get_ascii(show_internal=True))
+        if general_utils.debug_mode > 1:
+            print(t.get_ascii(show_internal=True))
 
         # Attaching the germline sequences to the tree
         gl_seq, cdr3_len, first_seq = find_gl_seq_in_df(df, general_utils.get_clone_number(t.id),
                                                         get_first_none_root_node_name(t))
+        if trunkless:
+            gl_seq = None
 
         # gl_seq = find_gl_seq_in_df(df, general_utils.get_clone_number(t.id))
         seq_num = 0
-        if gl_seq:
-            gl_seq = gl_seq.replace('.', '-')  # Replacing the dot with dashes
-            # t = attach_gl_to_tree(t, gl_seq)
-            t.sequence = gl_seq.upper()
+        if trunkless or gl_seq:
+            if gl_seq:
+                gl_seq = gl_seq.replace('.', '-')  # Replacing the dot with dashes
+                # t = attach_gl_to_tree(t, gl_seq)
+                t.sequence = gl_seq.upper()
 
             root = t
 
             # Attaching all the other sequences to the tree
             for node in t.traverse("preorder"):  # Going from root to leaves
-                if (node != root) and (hasattr(node, 'name')):  # This is not the root
+                if ((node != root) or (trunkless)) and (hasattr(node, 'name')):  # This is not the root (or if TL)
                     seq = find_seq_in_df(node.name, df)
                     if seq:
                         node.sequence = seq.replace('.', '-').upper()  # Replacing IMGT's '.' with standart '-'
@@ -172,14 +180,14 @@ def link_alignment_to_tree_by_df(t: Tree, df: pd.DataFrame, log_object=current_l
 
             # Attaching the hypothetical nodes
             alright_flag = True
-            if hasattr(t, 'sequence') and (not all_seq_assigned_flag):
+            if (trunkless or (hasattr(t, 'sequence')) and (not all_seq_assigned_flag)):
 
                 for node in t.traverse(
                         'preorder'):  # Going from root to leaves to fill all the unknown sequences by father
                     if hasattr(node, 'sequence'):
                         node.sequence = node.sequence.replace('.', '-').upper()
                     # If the node is identical to its father
-                    elif (node.get_distance(node.up) == 0) and (hasattr(node.up, 'sequence')):
+                    elif (node != root) and node.get_distance(node.up) == 0 and (hasattr(node.up, 'sequence')):
                         node.sequence = node.up.sequence.replace('.', '-').upper()
 
                 for node in t.traverse("postorder"):  # Going from leaves to root to generate missing sequences
@@ -192,6 +200,8 @@ def link_alignment_to_tree_by_df(t: Tree, df: pd.DataFrame, log_object=current_l
                                 general_utils.handle_errors(f'Could not generate a sequence to the node {node.name}.'
                                                             f'\nThe tree will not be analysed.',
                                                             log_object=log_object, exit_stat=False)
+                                print(f'Could not generate a sequence to the node {node.name}.'
+                                                            f'\nThe tree will not be analysed.')  # TEMP
                                 alright_flag = False
         else:
             general_utils.handle_errors(f'Could not find a germline sequence for tree {t.id}',
@@ -200,7 +210,6 @@ def link_alignment_to_tree_by_df(t: Tree, df: pd.DataFrame, log_object=current_l
         t.seq_num = seq_num
 
         if cdr3_len:
-            #cdr3_end = get_adjusted_cdr3_end(general_utils.imgt_regions['cdr3'], cdr3_len, first_seq)
             cdr3_end = general_utils.imgt_regions['cdr3'] + cdr3_len
             t.cdr3_end = cdr3_end
 
@@ -240,7 +249,8 @@ def find_gl_seq_in_df(df: pd.DataFrame, clone_number: int = None, first_seq_name
     gl_df = pd.DataFrame()  # An empty dataframe
 
     clones = df[_clone_field].unique()  # Number of different clones
-    # print(clones)
+    if general_utils.debug_mode:
+        print(clones)
 
     if not df.empty:
         if len(clones) == 1:  # The database contains only one clone
@@ -285,16 +295,21 @@ def find_seq_in_df(seq_name, df):
             if row[0] in seq_name:  # row[0] - df[ID_FIELD]
                 seq = row[1]  # row[1] - df[SEQ_FIELD]
 
+    if general_utils.debug_mode:
+        print(seq_name, seq)
+
     return seq
 
 
-def generate_trees_and_clone_dfs(tree_list: list, df: pd.DataFrame, log_object: Logger = None, illumina = False):
+def generate_trees_and_clone_dfs(tree_list: list, df: pd.DataFrame, log_object: Logger = None, colon_rep: str = None,
+                                 trunkless: bool = False):
     """
     Creates the tree lists and dataframe lists
+    :param trunkless: Whether the trunk was removed from tree
     :param tree_list: The input tree list
     :param df: The input dataframe
     :param log_object: The Logger object
-    :param illumina: Whether to replace colons with under-line
+    :param colon_rep: Whether to replace colons with under-line or a dash
     :return: Two lists - ete tree list, and pandas df list
     """
     if not log_object:
@@ -304,7 +319,7 @@ def generate_trees_and_clone_dfs(tree_list: list, df: pd.DataFrame, log_object: 
         clone_num = general_utils.get_clone_number(t.id)
         clone_df = create_clone_df(df, clone_num)
 
-        yield t, clone_df, log_object, illumina
+        yield t, clone_df, log_object, colon_rep, trunkless
 
 
 def create_clone_df(full_df: pd.DataFrame, clone_number: int):
@@ -322,10 +337,11 @@ def create_clone_df(full_df: pd.DataFrame, clone_number: int):
     return temp_df
 
 
-def attach_seqs_by_df(args, log_object: Logger = None):
+def attach_seqs_by_df(args, colon_rep: str, log_object: Logger = None):
     """
     Collect trees and attaches sequences to tree nodes.
     :param args: The input arguments
+    :param colon_rep: If not None, replace all ":" and ";" in the sequence names with this string
     :param log_object: The Logger object
     :return: A list of linked trees
     """
@@ -346,17 +362,13 @@ def attach_seqs_by_df(args, log_object: Logger = None):
         with mp.Pool(number_of_workers) as pool:
             # Using the generate_trees_and_clone_dfs generator
             trees = pool.starmap(link_alignment_to_tree_by_df,
-                                 generate_trees_and_clone_dfs(tree_list, df, log_object, args.illumina))
+                                 generate_trees_and_clone_dfs(tree_list, df, log_object, colon_rep, args.trunkless))
     else:
         general_utils.handle_errors(f'Could not create a dataframe from the file {args.database}', log_object,
                                     exit_stat=True)
         trees = []
 
     return trees
-
-
-def update_cdr3_length(t: Tree, cdr3_length):
-    pass
 
 
 def get_adjusted_cdr3_end(cdr3_start_pos: int, cdr3_length: int, seq: str):
