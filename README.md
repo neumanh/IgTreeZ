@@ -319,7 +319,9 @@ Inside it, it creates these files:
 * **XXX_errors.log** - An error log file (created only if the program encounters an error)
 
 
-
+## Citing
+To cite IgTreeZ in publications, please use:
+Neuman, H., Arrouasse, J., Kedmi, M., Cerutti, A., Magri, G., and Mehr, R. IgTreeZ, A toolkit for immunoglobulin gene lineage tree-based analysis, reveals CDR3s are crucial for selection analysis. Front. Immunol. in press. doi: 10.3389/fimmu.2022.822834.
 
 ## License
 Distributed under the AGPL3 License. See `LICENSE` for more information.
