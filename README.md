@@ -321,7 +321,8 @@ Inside it, it creates these files:
 
 ## Citing
 To cite IgTreeZ in publications, please use:  
-Neuman H, Arrouasse J, Kedmi M, Cerutti A, Magri G, Mehr R. IgTreeZ, A Toolkit for Immunoglobulin Gene Lineage Tree-Based Analysis, Reveals CDR3s Are Crucial for Selection Analysis. Front Immunol. 2022 Oct 26;13:822834. doi: 10.3389/fimmu.2022.822834. PMID: 36389731; PMCID: PMC9643157. [https://www.frontiersin.org/articles/10.3389/fimmu.2022.822834/full]
+Neuman H, Arrouasse J, Kedmi M, Cerutti A, Magri G, Mehr R. IgTreeZ, A Toolkit for Immunoglobulin Gene Lineage Tree-Based Analysis, Reveals CDR3s Are Crucial for Selection Analysis. Front Immunol. 2022 Oct 26;13:822834. doi: 10.3389/fimmu.2022.822834. PMID: 36389731; PMCID: PMC9643157.   
+The paper can be found [here](https://www.frontiersin.org/articles/10.3389/fimmu.2022.822834/full).
 
 ## License
 Distributed under the AGPL3 License. See `LICENSE` for more information.
