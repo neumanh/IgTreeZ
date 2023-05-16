@@ -78,9 +78,6 @@ if ('cdr3_end' %in% names(df)){
 }
 
 
-# Choosing text size
-num_samples <- length(unique(sample_names))
-cat('******NUM SAMPLES ', num_samples, '\n\n')
 
 # Calculate selection scores
 baseline <- calcBaseline(expected, testStatistic = "focused",
@@ -98,28 +95,26 @@ grouped@db$sample <- factor(gsub('_', ' ', grouped@db$sample), levels = sample_o
 
 # Plot selection PDFs for a subset of the data
 p <- plotBaselineDensity(grouped, "sample", sigmaLimits=c(-1, 1), silent = T) + 
-  theme(text = element_text(size=12), legend.text = element_text(size = 12), 
+  theme(text = element_text(size=20), legend.text = element_text(size = 20), 
         legend.title = element_blank(), legend.key.size = unit(0.9, "cm"), 
         legend.title.align = 0.25) +
   xlab("Selection score")
-
+  
 ggsave(p_den_name, p, width=9)
 
 
 # Plot mean and confidence interval by time-point
 
 # Replacing the stat-sample names with " " and wrapping
-grouped@stats$sample <- gsub('_', ' ', grouped@stats$sample)
-grouped@stats$sample <- str_wrap(grouped@stats$sample, width = 10)
+#grouped@stats$sample <- gsub('_', ' ', grouped@stats$sample)
+#grouped@stats$sample <- str_wrap(grouped@stats$sample, width = 10)
 
 
 p <- plotBaselineSummary(grouped@stats, "sample", size = 1.15, silent = T) + 
-  ylab("Selection score")
-if (num_samples < 10) {
-  p <- p + theme(text = element_text(size=12), 
-        axis.text.x = element_text(size = 12, color = "black",
+  ylab("Selection score") +
+  theme(text = element_text(size=20), 
+        axis.text.x = element_text(size = 15, color = "black",
                                    angle = 0, hjust = 0.5))
-}
 
 ggsave(p_sum_name, p)
 
@@ -128,7 +123,7 @@ new_stats <- grouped@stats
 
 i = 1
 for (sn in unique(grouped@stats$sample)) {
-  
+
   new_stats$sample <- gsub(paste0('\\b',sn,'\\b'), paste0(i, '_', sn), new_stats$sample) # The \b is used to replace the whole phrase
   i = i+1
 }
@@ -136,8 +131,8 @@ for (sn in unique(grouped@stats$sample)) {
 p_sum_name <- paste0(plot_prefix, '_selection_sum_ordered_with_cdr3.pdf', collapse = "_")
 p <- plotBaselineSummary(new_stats, "sample", size = 1.15, silent = T) + 
   ylab("Selection score") +
-  theme(text = element_text(size=12), 
-        axis.text.x = element_text(size = 12, color = "black",
+  theme(text = element_text(size=20), 
+        axis.text.x = element_text(size = 15, color = "black",
                                    angle = 0, hjust = 0.5))
 ggsave(p_sum_name, p)
 ############
@@ -148,5 +143,10 @@ con <- file(file_name)
 sink(con)
 testBaseline(grouped, groupBy="sample")
 write.csv(grouped@stats, csv_name)
+
+
+# Ordering the sample names by the input order
+#grouped@stats <- grouped@stats[order(match(grouped@stats$sample, sample_order)),]
+
 
 

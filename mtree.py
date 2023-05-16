@@ -52,7 +52,7 @@ def get_od_array(t: Tree):
                 dist = int(node.get_distance(node.up))  # The distance to the father
                 if dist > 1:
                     # temp_arr = np.repeat(1, (dist - 1))  # Create an array of ones in the length of the distance-1
-                    temp_arr = [1] * (dist-1)  # Create an array of ones in the length of the distance-1
+                    temp_arr = [1 for _ in range(dist - 1)]  # Create an array of ones in the length of the distance-1
                     od_array += temp_arr
 
         if not node.is_root():
@@ -93,7 +93,16 @@ def get_trunk_len(t: Tree):
             first_split_node = node  # Stop the search in you got to a split node or to a leaf
 
     if first_split_node.is_root():  # The root splits
-        trunk = 0
+        dist_arr = []
+        for child in first_split_node.get_children():
+            dist_to_root = child.get_distance(t)
+            # dist_arr.append(dist_to_root)
+            dist_arr.append(dist_to_root)
+        if dist_arr:
+            dist_arr = np.array(dist_arr)
+            trunk = np.mean(dist_arr)
+        else:
+            trunk = 0  # The root is all the tree
     else:
         trunk = first_split_node.get_distance(t)
 
@@ -196,10 +205,7 @@ def get_one_tree_attr(t: Tree):
         tr.nodes = nodes
         tr.leaves = leaves
         tr.od_avg = np.mean(od_array)
-        if sod_array.any():
-            tr.sod_avg = np.mean(sod_array)
-        else:
-            tr.sod_avg = None
+        tr.sod_avg = np.mean(sod_array)
         tr.rootd = get_root_degree(t)
         tr.drsn_min = drsn_min
         if len(dasn_array) > 0:
@@ -207,10 +213,7 @@ def get_one_tree_attr(t: Tree):
         else:
             tr.dasn_min = None
         tr.trunk = trunk
-        if dlfsn_array.any():
-            tr.dlfsn_avg = np.mean(dlfsn_array)
-        else:
-            tr.dlfsn_avg = None
+        tr.dlfsn_avg = np.mean(dlfsn_array)
         tr.pl_min = np.min(pl_array)
 
         tr = tr.get_dict()

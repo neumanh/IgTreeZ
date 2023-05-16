@@ -32,31 +32,29 @@ def grouped_box_plot(df: pd.DataFrame, x: str, y: str, hue: str, fig_name: str =
     """
     import seaborn as sns  # Used only here
 
+    sns.set(rc={'figure.figsize': (10, 5)})  # To create wider image
+    sns.set_style("white")
+
     # create grouped boxplot
     labels = df[hue].unique()
     colors = create_color_dict(labels)
-    flierprops = dict(marker='o', markerfacecolor='w', markersize=3)
+    flierprops = dict(marker='o', markerfacecolor='w')
 
     base_font_size = 10
     num_groups = len(df[x].unique())
-    sns.set(rc={'figure.figsize': (5, 5)})
-    if num_groups > 1:
-        sns.set(rc={'figure.figsize': (6, 5)})
-    if num_groups > 2:
-        sns.set(rc={'figure.figsize': (8, 5)})  # To create wider image
+    if num_groups > 4:
+        font_size = 8
         if num_groups > 6:
-            sns.set(rc={'figure.figsize': (10, 5)})
-    sns.set_style("white")
+            font_size = 6
+        matplotlib.rc('font', size=font_size)
 
     df[x] = df[x].str.replace('_', '\n')
     df[x] = df[x].str.capitalize()
 
-    ax = sns.boxplot(x=x, y=y, hue=hue, data=df, palette=colors, linewidth=1, flierprops=flierprops, width=0.5)
-    if num_groups > 1:
-        ax.set_yscale("log")
+    ax = sns.boxplot(x=x, y=y, hue=hue, data=df, palette=colors, linewidth=1, flierprops=flierprops)
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=base_font_size)
     plt.xlabel('')
-    plt.ylabel('')
+    plt.ylabel('Mutations', fontsize=base_font_size)
     fig = ax.get_figure()
     fig.savefig(fig_name)
 

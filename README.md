@@ -18,11 +18,11 @@ To use the 'draw' sub-program, you will need [Graphviz](https://graphviz.org/dow
    ```sh
    git clone https://github.com/neumanh/IgTreeZ.git
    ```
-2. Download [IgTreeZ_1.8.2.tar.gz](./IgTreeZ_1.8.2.tar.gz). To extract the file in the local directory, use
+2. Download [IgTreeZ_1.7.0.tar.gz](./IgTreeZ_1.7.0.tar.gz). To extract the file in the local directory, use
    ```sh
    tar -zxvf IgTreeZ*.tar.gz
    ```
-3. Download [IgTreeZ_1.8.2.zip](./IgTreeZ_1.8.2.zip). To extract the file in the local directory, use
+3. Download [IgTreeZ_1.7.0.zip](./IgTreeZ_1.7.0.zip). To extract the file in the local directory, use
    ```sh
    unzip IgTreeZ*.zip
    ```
@@ -107,7 +107,7 @@ igtreez.py mutations -n example_name -t ../examples/*nw -d ../examples/F1-contro
 Multiple output datasets can be input to an Rscript that quantifies the selection using the [ShazaM](https://shazam.readthedocs.io/en/stable/vignettes/Baseline-Vignette/)'s selection test on the given mutation counts:
 
 ```sh
-Rscript shazam_selection_on_igtreez_output.r example_name1_for_selection.csv example_name2_for_selection.csv
+Rscript run_shazam_on_trees_with_CDR3.r example_name1_for_selection.csv example_name2_for_selection.csv
 ```
 
 If the script finds the 'CDR3_length' column in the datasets, it counts for the Ig sequence till the end of the CDR3 region.
@@ -321,7 +321,7 @@ Inside it, it creates these files:
 
 ## Citing
 To cite IgTreeZ in publications, please use:  
-Neuman, H., Arrouasse, J., Kedmi, M., Cerutti, A., Magri, G., and Mehr, R. IgTreeZ, A toolkit for immunoglobulin gene lineage tree-based analysis, reveals CDR3s are crucial for selection analysis. Front. Immunol. in press. doi: 10.3389/fimmu.2022.822834.
+Neuman H, Arrouasse J, Kedmi M, Cerutti A, Magri G, Mehr R. IgTreeZ, A Toolkit for Immunoglobulin Gene Lineage Tree-Based Analysis, Reveals CDR3s Are Crucial for Selection Analysis. Front Immunol. 2022 Oct 26;13:822834. doi: 10.3389/fimmu.2022.822834. PMID: 36389731; PMCID: PMC9643157. [https://www.frontiersin.org/articles/10.3389/fimmu.2022.822834/full]
 
 ## License
 Distributed under the AGPL3 License. See `LICENSE` for more information.
@@ -335,3 +335,7 @@ Prof. Ramit Mehr ramit.mehr@biu.ac.il
 
 
 Project Link: [https://github.com/neumanh/IgTreeZ](https://github.com/neumanh/IgTreeZ)
+
+
+   
+

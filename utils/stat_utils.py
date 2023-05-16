@@ -88,7 +88,6 @@ def ttest(arg_list):
     """
     out_str = ''
     pval_dict = {}
-    pval_dict_dep = {}
     for idx1, arg1 in enumerate(arg_list):
         for idx2, arg2 in enumerate(arg_list):
             if idx1 < idx2:
@@ -100,10 +99,8 @@ def ttest(arg_list):
                     tp = stats.ttest_rel(arg1, arg2, nan_policy='omit')
                     out_str += f'comparing {arg1.name} with {arg2.name} using paired T-test ' \
                                f'for DEPENDANT data sets:\t {tp}\n'
-                    pval_dict_dep[dict_label] = tp[1]
-                else:
-                    pval_dict_dep[dict_label] = tt[1]
-    return out_str, pval_dict, pval_dict_dep
+
+    return out_str, pval_dict
 
 
 def mwtest(arg_list):
@@ -116,7 +113,6 @@ def mwtest(arg_list):
     # print(len(arg_list))
     out_str = ''
     pval_dict = {}
-    pval_dict_dep = {}
     for idx1, arg1 in enumerate(arg_list):
         for idx2, arg2 in enumerate(arg_list):
             if idx1 < idx2:
@@ -128,11 +124,8 @@ def mwtest(arg_list):
                     tp = stats.wilcoxon(arg1, arg2)
                     out_str += f'comparing {arg1.name} with {arg2.name} using Wilcoxon test ' \
                                f'for DEPENDANT data sets:\t {tp}\n'
-                    pval_dict_dep[dict_label] = tp[1]
-                else:
-                    pval_dict_dep[dict_label] = mw[1]
 
-    return out_str, pval_dict, pval_dict_dep
+    return out_str, pval_dict
 
 
 def all_identicle(data_list: list):
@@ -192,7 +185,7 @@ def analyze_df(df: pd.DataFrame, name: str, out_file: str = None, log_object: Lo
                     out_str += f'ANOVA results: {anova}\n'
 
                     # Post Hoc
-                    curr_str, pval_dict, pval_dep = ttest(data_list)
+                    curr_str, pval_dict = ttest(data_list)
                     out_str += curr_str
 
                 else:  # Non parametric
@@ -209,18 +202,13 @@ def analyze_df(df: pd.DataFrame, name: str, out_file: str = None, log_object: Lo
                     out_str += f'Kruskal Wallis results: {kw}\n'
 
                     # Post Hoc
-                    curr_str, pval_dict, pval_dep = mwtest(data_list)
+                    curr_str, pval_dict = mwtest(data_list)
                     out_str += curr_str
                 curr_str, fdr_dict = benj_hoch(pval_dict)
                 out_str += curr_str
 
-                if pval_dep != pval_dict:
-                    curr_str1 = 'Including DEPENDANT result: '
-                    curr_str2, _ = benj_hoch(pval_dep)
-                    out_str += curr_str1
-                    out_str += curr_str2
-            else:  # all identical
-                out_str += 'All values are identical. Not analyzing significance.\n'
+            else:
+                out_str += 'All values are identicle. Not analyzing siginificance.\n'
 
             out_str += '-------------------------------------------------------------\n\n'
 
