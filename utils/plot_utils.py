@@ -76,16 +76,24 @@ def box_plot(dicti: dict, fig_name: str = 'box_plot.pdf', xlab: str = 'Transitio
     # Collect the data
     all_data, labels = dict_to_lists(dicti)
 
-    # Enlarging the fonts
-    if font:
-        font = int(font)
-        matplotlib.rc('font', size=font)
-        matplotlib.rc('ytick', labelsize=(font - 2))
-
     new_labels = [a.replace('_', '\n') for a in labels]
 
     if len(labels) > 1:
         fig, ax = plt.subplots()
+
+        # Adjusting the plot for large number of populations
+        # Enlarging the fonts
+        if font:
+            font = int(font)
+        else:  # Default size font
+            if len(labels) > 15:
+                font = 5
+            elif len(labels) > 7:
+                font = 7
+            elif len(labels) > 3:
+                font = 9
+            else:
+                font = 12
 
         # rectangular box plot with customized median lines
         medianprops = dict(linewidth=1, color='black')
@@ -100,23 +108,13 @@ def box_plot(dicti: dict, fig_name: str = 'box_plot.pdf', xlab: str = 'Transitio
         for patch, color in zip(bplot['boxes'], colors):
             patch.set_facecolor(color)
 
-        # Adjusting the plot for large number of populations
-        # if len(labels) > 20:
-        #     plt.setp(ax.get_xticklabels(), rotation=90)  # Rotate in 30 degrees
-        #     plt.gcf().subplots_adjust(bottom=0.3)  # Add the bottom space
-        # elif (len(labels) > 15) or (font >= 14):
-        #     plt.setp(ax.get_xticklabels(), rotation=45,
-        #              horizontalalignment='right')  # Rotate in 90 degrees (vertically)
-        #     plt.gcf().subplots_adjust(bottom=0.3)  # Add the bottom space
-        # elif len(labels) > 3:
-        #     plt.setp(ax.get_xticklabels(), rotation=30,
-        #              horizontalalignment='right')  # Rotate in 90 degrees (vertically)
-        #     plt.gcf().subplots_adjust(bottom=0.15)  # Add the bottom space
-
         ax.set_ylabel(ylab.capitalize().replace('_', ' '))
 
         # Adjusting the limits
         plt.gcf().subplots_adjust(left=0.15)
+
+        # change the fontsize
+        ax.tick_params(axis='x', labelsize=font)
 
         plt.savefig(fig_name)
         plt.close()
