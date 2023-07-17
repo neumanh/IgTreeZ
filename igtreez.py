@@ -116,12 +116,20 @@ def get_arg_parser():
                                                                      'represents the germline sequences, '
                                                                      'infer the root sequences same as the other '
                                                                      'nodes. Only for database input'
-                                                                  'To be used with the \'--illumina\' argument')
-    parser_mut.add_argument('-cf', '--clone_field', help='The clone field. default - as in ChangeO / AIRR format')
-    parser_mut.add_argument('-sf', '--seq_field', help=f'The sequence field. default - as in ChangeO / AIRR format')
-    parser_mut.add_argument('-gf', '--gl_field', help=f'The germline field. default - as in ChangeO / AIRR format')
-    parser_mut.add_argument('-if', '--id_field', help=f'The sequence ID field. default - as in ChangeO / AIRR format')
-    parser_mut.add_argument('-gl', '--gl_name', help=f'The germline name. default - GL', default='GL')
+                                                                     'To be used with the \'--illumina\' argument')
+    parser_mut.add_argument('-cf', '--clone_field', help=f'The clone field. default - '
+                                                         f'for ChangeO format: CLONE . For '
+                                                         f'AIRR format: clone_id')
+    parser_mut.add_argument('-sf', '--seq_field', help=f'The sequence field. default - '
+                                                       f'for ChangeO format: SEQUENCE_IMGT . For '
+                                                       f'AIRR format: sequence_alignment')
+    parser_mut.add_argument('-gf', '--gl_field', help=f'The germline field. default - '
+                                                      f'for ChangeO format: GERMLINE_IMGT_D_MASK . For '
+                                                      f'AIRR format: germline_alignment')
+    parser_mut.add_argument('-if', '--id_field', help=f'The sequence ID field. default - '
+                                                      f'for ChangeO format: SEQUENCE_ID . For '
+                                                      f'AIRR format: sequence_id')
+    parser_mut.add_argument('-gl', '--gl_name', help=f'The germline name in trees. default - GL', default='GL')
     parser_mut.set_defaults(function=call_mutations)
 
     # The mtree analysis
