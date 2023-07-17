@@ -78,7 +78,7 @@ def plot(trans_dict: dict, norm_dict_by_source: dict, norm_dict_by_dest: dict, p
 
 
 def save_output_tables(trans_dict: dict, norm_dict_by_source: dict, norm_dict_by_dest: dict, pop_dict: dict, trans_df,
-                       pop_df, name: str, out_dir: str):
+                       trans_df_dist, pop_df, name: str, out_dir: str):
     """
     Saves the output tables
     :param trans_dict: The transitions dictionary
@@ -86,22 +86,24 @@ def save_output_tables(trans_dict: dict, norm_dict_by_source: dict, norm_dict_by
     :param norm_dict_by_dest: The transitions dictionary, normalized by destination population
     :param pop_dict: The populations dictionary
     :param trans_df: The transitions dataframe (with tree id)
+    :param trans_df_dist: The transition distances dataframe (with tree id)
     :param pop_df: The populations dataframe (with tree id)
     :param name: The analysis name
     :param out_dir: The output directory
     :return: None
     """
     # Defining output names
-    transitions_by_tree_name = f'{out_dir}/{name}_transitions_count_by_tree.csv'
-    populations_by_tree_name = f'{out_dir}/{name}_populations_count_by_tree.csv'
+    transitions_by_tree_name = f'{out_dir}/{name}_transition_counts_by_tree.csv'
+    populations_by_tree_name = f'{out_dir}/{name}_population_counts_by_tree.csv'
+    transitions_by_tree_name_with_dist = f'{out_dir}/{name}_transition_distances_by_tree.csv'
     transitions_csv_name = f'{out_dir}/{name}_transition_distances.csv'
-    transitions_norm_by_source_csv_name = f'{out_dir}/{name}_transition_count_normalized_by_source.csv'
-    transitions_norm_by_dest_csv_name = f'{out_dir}/{name}_transition_count_normalized_by_destination.csv'
+    transitions_norm_by_source_csv_name = f'{out_dir}/{name}_transition_counts_normalized_by_source.csv'
+    transitions_norm_by_dest_csv_name = f'{out_dir}/{name}_transition_counts_normalized_by_destination.csv'
     populations_csv_name = f'{out_dir}/{name}_population_levels.csv'
-    transitions_stats_name = f'{out_dir}/{name}_transitions_distance_summary.csv'
-    transitions_nor_source_stats_name = f'{out_dir}/{name}_transitions_summary_normalized_by_source.csv'
-    transitions_nor_dest_stats_name = f'{out_dir}/{name}_transitions_summary_normalized_by_destination.csv'
-    populations_stats_name = f'{out_dir}/{name}_populations_level_summary.csv'
+    transitions_stats_name = f'{out_dir}/{name}_transition_distances_summary.csv'
+    transitions_nor_source_stats_name = f'{out_dir}/{name}_transition_summary_normalized_by_source.csv'
+    transitions_nor_dest_stats_name = f'{out_dir}/{name}_transition_summary_normalized_by_destination.csv'
+    populations_stats_name = f'{out_dir}/{name}_population_levels_summary.csv'
 
     # Saving the outputs
     if len(trans_dict) > 0:
@@ -120,6 +122,10 @@ def save_output_tables(trans_dict: dict, norm_dict_by_source: dict, norm_dict_by
         # Insert a sample name in the beginning of the name
         pop_df = poptree_utils.add_sample_column(pop_df, name)
         pop_df.to_csv(populations_by_tree_name, index=False)
+    if trans_df_dist.any:
+        # Insert a sample name in the beginning of the name
+        trans_df_dist = poptree_utils.add_sample_column(trans_df_dist, name)
+        trans_df_dist.to_csv(transitions_by_tree_name_with_dist, index=False)
 
 
 def poptree(args):
@@ -142,11 +148,11 @@ def poptree(args):
     number_of_workers = min(args.ncors, len(tree_list))
     with mp.Pool(number_of_workers) as pool:
         # Running poptree in parallel
-        result = pool.starmap(create_dicts, zip(tree_list, repeat(pops), repeat(args.zero)))
+        result = pool.starmap(create_dicts, zip(tree_list, repeat(pops), repeat(args.zero), repeat(args.max_dist)))
     log_object.info(f'Finish going over the trees')
 
     # Collecting the output
-    trans_dict, pop_dict, trans_list, pop_list = unite_starmap_poptree_results(result)
+    trans_dict, pop_dict, trans_list, pop_list, trans_list_dist = unite_starmap_poptree_results(result)
 
     norm_dict_by_source = poptree_utils.normalize_by_the_source(trans_dict, pop_dict)
     norm_dict_by_dest = poptree_utils.normalize_by_the_dest(trans_dict, pop_dict)
@@ -160,6 +166,7 @@ def poptree(args):
     output_dir = general_utils.create_output_dir(args.name, 'PopTree_results', log_object)
 
     trans_df = pd.DataFrame(trans_list)
+    trans_df_dist = pd.DataFrame(trans_list_dist)
     pop_df = pd.DataFrame(pop_list)
 
     pop_count = np.array(poptree_utils.count_pops_num_in_tree(pop_df))
@@ -175,11 +182,9 @@ def poptree(args):
     norm_dict_by_source = edit_transitions_dict(norm_dict_by_source)
     norm_dict_by_dest = edit_transitions_dict(norm_dict_by_dest)
 
-    print(trans_dict)  # TEMP
-
     # Saving the analysis results to files
-    save_output_tables(trans_dict, norm_dict_by_source, norm_dict_by_dest, pop_dict, trans_df, pop_df, args.name,
-                       output_dir)
+    save_output_tables(trans_dict, norm_dict_by_source, norm_dict_by_dest, pop_dict, trans_df, trans_df_dist, pop_df,
+                       args.name, output_dir)
 
     log_object.info(f'The output files were saved in: {output_dir}')
     log_object.done()
@@ -251,6 +256,21 @@ def sum_dict(dic: dict):
     return sum_dic
 
 
+def str_dict(dic: dict):
+    """
+    Returns a string of elements in each dictionary item (a list) in the format '1 2 2 1 3'
+    :param dic: A dictionary of lists
+    :return: A summed-up dictionary
+    """
+    sum_dic = {}
+    for key in dic:
+        temp_dist_list = []
+        for dist in dic[key]:
+            temp_dist_list.append(str(int(dist)))
+        sum_dic[key] = ' '.join(temp_dist_list)
+    return sum_dic
+
+
 def unite_starmap_poptree_results(res: list):
     """
     Unites the poptree-starmap results
@@ -261,6 +281,7 @@ def unite_starmap_poptree_results(res: list):
     pops_dict = {}
     transitions_list = []
     pops_list = []
+    transitions_list_dist = []
 
     for three_dicts in res:
         # Update the dictionaries for plotting
@@ -276,9 +297,10 @@ def unite_starmap_poptree_results(res: list):
         # Add to the lists of dictionaries
         edited_curr_transitions_dict = edit_transitions_dict(curr_transitions_dict)
         transitions_list.append({**id_item, **sum_dict(edited_curr_transitions_dict)})
+        transitions_list_dist.append({**id_item, **str_dict(edited_curr_transitions_dict)})
         pops_list.append({**id_item, **sum_dict(curr_pops_dict)})
 
-    return transitions_dict, pops_dict, transitions_list, pops_list
+    return transitions_dict, pops_dict, transitions_list, pops_list, transitions_list_dist
 
 
 def edit_transitions_dict(trans_dict: dict):
@@ -317,7 +339,7 @@ def save_to_file(data_dict: dict, table_file_name: str, stat_file_name: str, sam
     df_sum.to_csv(stat_file_name)
 
 
-def create_dicts(t, pops: list, zero: bool = False):
+def create_dicts(t, pops: list, zero: bool = False, max_dist = None):
     """
     Creates the transition and population dictionaries
     :param t: An ETE tree
@@ -347,20 +369,20 @@ def create_dicts(t, pops: list, zero: bool = False):
 
             # Going over all the paths
             for idx, node_object in enumerate(path):
+                # print('########### idx', idx )
                 dist_idx = dist_idx + node_object.dist
                 node_name = node_object.name
 
                 for pop in pops:
                     if pop in node_name:
-                        # print("pop:", pop, "node name:", node_name)
 
                         # Saving the nodes' names
                         if not poptree_utils.multiple_pops_in_name(node_name, pops):  # To prevent unknown transition
-                            # if True:  # Testing
                             if not node2:
                                 node2 = node_name
                                 pop2 = pop
                                 idx2 = idx
+                                # print('pop2', pop2, 'idx2', idx2)
 
                             elif not node1:
                                 node1 = node_name
@@ -377,14 +399,14 @@ def create_dicts(t, pops: list, zero: bool = False):
 
                 elif node1 and node2:  # And not pop1 == pop2
                     dist = poptree_utils.sum_path(path, idx2) - poptree_utils.sum_path(path, idx1)
-                    if (node1, node2) not in trans_set:  # A new transition
+                    if ((node1, node2) not in trans_set) and ((max_dist is None) or (dist <= max_dist)):  # A new transition
                         trans_set.add(
                             (node1, node2))  # Add the tuple to the set to make share averey edge is handled once
                         # Update the transition dictionary,
                         # while the tuple is the key in the transition count dictionary
                         trans_dict = add_dist_to_dict(key=(pop1, pop2), dist=dist, dic=trans_dict)
 
-                    node2, pop2 = node1, pop1  # Move to the next transition
+                    node2, pop2, idx2 = node1, pop1, idx1  # Move to the next transition
                     node1, pop1 = None, None
 
                 # Count zero-length transitions
