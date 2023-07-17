@@ -6,8 +6,8 @@ Plots Ig statistics
 # Info
 __author__ = 'Hadas Neuman'
 __mail__ = 'hadas.doron@gmail.com'
-__version__ = '1.7.6'
-__date__ = '8/3/22'
+__version__ = '1.8.4'
+__date__ = '17/7/23'
 
 import multiprocessing as mp
 from argparse import ArgumentParser
@@ -116,20 +116,12 @@ def get_arg_parser():
                                                                      'represents the germline sequences, '
                                                                      'infer the root sequences same as the other '
                                                                      'nodes. Only for database input'
-                                                                     'To be used with the \'--illumina\' argument')
-    parser_mut.add_argument('-cf', '--clone_field', help=f'The clone field. default - '
-                                                         f'for ChangeO format: CLONE . For '
-                                                         f'AIRR format: clone_id')
-    parser_mut.add_argument('-sf', '--seq_field', help=f'The sequence field. default - '
-                                                       f'for ChangeO format: SEQUENCE_IMGT . For '
-                                                       f'AIRR format: sequence_alignment')
-    parser_mut.add_argument('-gf', '--gl_field', help=f'The germline field. default - '
-                                                      f'for ChangeO format: GERMLINE_IMGT_D_MASK . For '
-                                                      f'AIRR format: germline_alignment')
-    parser_mut.add_argument('-if', '--id_field', help=f'The sequence ID field. default - '
-                                                      f'for ChangeO format: SEQUENCE_ID . For '
-                                                      f'AIRR format: sequence_id')
-    parser_mut.add_argument('-gl', '--gl_name', help=f'The germline name in trees. default - GL', default='GL')
+                                                                  'To be used with the \'--illumina\' argument')
+    parser_mut.add_argument('-cf', '--clone_field', help='The clone field. default - as in ChangeO / AIRR format')
+    parser_mut.add_argument('-sf', '--seq_field', help=f'The sequence field. default - as in ChangeO / AIRR format')
+    parser_mut.add_argument('-gf', '--gl_field', help=f'The germline field. default - as in ChangeO / AIRR format')
+    parser_mut.add_argument('-if', '--id_field', help=f'The sequence ID field. default - as in ChangeO / AIRR format')
+    parser_mut.add_argument('-gl', '--gl_name', help=f'The germline name. default - GL', default='GL')
     parser_mut.set_defaults(function=call_mutations)
 
     # The mtree analysis
@@ -146,6 +138,7 @@ def get_arg_parser():
                                required=True)
     parse_poptree.add_argument('--plot', action='store_true', help='Plots the populations statistics')
     parse_poptree.add_argument('-z', '--zero', action='store_true', help='Analyse zero distance transitions as well')
+    parse_poptree.add_argument('--max_dist', type=int, help='Count only transitions that involve less mutations (inclusive)')
 
     parse_poptree.set_defaults(function=call_poptree)
     # The filter analysis
@@ -245,3 +238,4 @@ if __name__ == "__main__":
 
     if check_arguments(arguments):
         arguments.function(arguments)
+
